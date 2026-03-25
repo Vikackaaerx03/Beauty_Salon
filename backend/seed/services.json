@@ -1,0 +1,142 @@
+[
+  {
+    "_id": 1,
+    "name": "Манікюр",
+    "description": "Класичний манікюр з обробкою кутикули",
+    "price": 450.0,
+    "duration_minutes": 60
+  },
+  {
+    "_id": 2,
+    "name": "Педикюр",
+    "description": "Класичний педикюр (гігієнічний)",
+    "price": 550.0,
+    "duration_minutes": 75
+  },
+  {
+    "_id": 3,
+    "name": "Дизайн нігтів",
+    "description": "Простий дизайн (1–2 акценти)",
+    "price": 200.0,
+    "duration_minutes": 30
+  },
+  {
+    "_id": 4,
+    "name": "Нарощування вій",
+    "description": "Класичне нарощування (1D)",
+    "price": 900.0,
+    "duration_minutes": 120
+  },
+  {
+    "_id": 5,
+    "name": "Корекція брів",
+    "description": "Форма + корекція (пінцет/віск)",
+    "price": 350.0,
+    "duration_minutes": 40
+  },
+  {
+    "_id": 6,
+    "name": "Фарбування брів",
+    "description": "Фарбування брів фарбою",
+    "price": 300.0,
+    "duration_minutes": 30
+  },
+  {
+    "_id": 7,
+    "name": "Стрижка жіноча",
+    "description": "Стрижка + легка укладка",
+    "price": 600.0,
+    "duration_minutes": 60
+  },
+  {
+    "_id": 8,
+    "name": "Стрижка чоловіча",
+    "description": "Класична чоловіча стрижка",
+    "price": 450.0,
+    "duration_minutes": 45
+  },
+  {
+    "_id": 9,
+    "name": "Укладка",
+    "description": "Повсякденна укладка феном",
+    "price": 500.0,
+    "duration_minutes": 50
+  },
+  {
+    "_id": 10,
+    "name": "Тонування волосся",
+    "description": "Тонування/глосинг",
+    "price": 1200.0,
+    "duration_minutes": 120
+  },
+  {
+    "_id": 11,
+    "name": "Манікюр",
+    "description": "Апаратний манікюр",
+    "price": 520.0,
+    "duration_minutes": 70
+  },
+  {
+    "_id": 12,
+    "name": "Педикюр",
+    "description": "Апаратний педикюр",
+    "price": 650.0,
+    "duration_minutes": 90
+  },
+  {
+    "_id": 13,
+    "name": "Дизайн нігтів",
+    "description": "Складніший дизайн/градієнт",
+    "price": 250.0,
+    "duration_minutes": 40
+  },
+  {
+    "_id": 14,
+    "name": "Стрижка жіноча",
+    "description": "Модельна стрижка (каре/каскад)",
+    "price": 650.0,
+    "duration_minutes": 70
+  },
+  {
+    "_id": 15,
+    "name": "Масаж обличчя",
+    "description": "Релакс-масаж обличчя",
+    "price": 700.0,
+    "duration_minutes": 60
+  },
+  {
+    "_id": 16,
+    "name": "Чистка обличчя",
+    "description": "Комбінована чистка",
+    "price": 1100.0,
+    "duration_minutes": 90
+  },
+  {
+    "_id": 17,
+    "name": "Пілінг",
+    "description": "М’який пілінг (за типом шкіри)",
+    "price": 850.0,
+    "duration_minutes": 60
+  },
+  {
+    "_id": 18,
+    "name": "Макіяж",
+    "description": "Денний макіяж",
+    "price": 800.0,
+    "duration_minutes": 60
+  },
+  {
+    "_id": 19,
+    "name": "Макіяж",
+    "description": "Вечірній макіяж",
+    "price": 1200.0,
+    "duration_minutes": 90
+  },
+  {
+    "_id": 20,
+    "name": "Нарощування вій",
+    "description": "Обʼєм 2D",
+    "price": 950.0,
+    "duration_minutes": 130
+  }
+]

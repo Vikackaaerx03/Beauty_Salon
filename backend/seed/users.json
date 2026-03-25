@@ -1,0 +1,102 @@
+[
+  {
+    "_id": 1,
+    "name": "Victoria Roslav",
+    "email": "vikaroslav.test@gmail.com",
+    "role": "admin",
+    "rating": 0.0,
+    "services_offered": [],
+    "password": "admin123",
+    "created_at": "2026-03-20T09:00:00Z"
+  },
+  {
+    "_id": 2,
+    "name": "Олена Гринюк",
+    "email": "olena.hryniuk.test@gmail.com",
+    "role": "master",
+    "rating": 4.9,
+    "services_offered": ["1", "3", "5", "11", "13"],
+    "password": "master111",
+    "created_at": "2026-03-20T09:10:00Z"
+  },
+  {
+    "_id": 3,
+    "name": "Іван Шевченко",
+    "email": "ivan.shevchenko.test@gmail.com",
+    "role": "master",
+    "rating": 4.7,
+    "services_offered": ["7", "8", "9", "10", "14"],
+    "password": "master222",
+    "created_at": "2026-03-20T09:15:00Z"
+  },
+  {
+    "_id": 4,
+    "name": "Марія Коваль",
+    "email": "maria.koval.test@gmail.com",
+    "role": "master",
+    "rating": 4.8,
+    "services_offered": ["4", "5", "6", "20"],
+    "password": "master333",
+    "created_at": "2026-03-20T09:20:00Z"
+  },
+  {
+    "_id": 5,
+    "name": "Анна Мельник",
+    "email": "anna.melnyk.test@gmail.com",
+    "role": "master",
+    "rating": 4.6,
+    "services_offered": ["15", "16", "17", "18", "19"],
+    "password": "master444",
+    "created_at": "2026-03-20T09:25:00Z"
+  },
+  {
+    "_id": 6,
+    "name": "Дмитро Савчук",
+    "email": "dmytro.savchuk.test@gmail.com",
+    "role": "master",
+    "rating": 4.5,
+    "services_offered": ["2", "12", "1", "3"],
+    "password": "master555",
+    "created_at": "2026-03-20T09:30:00Z"
+  },
+  {
+    "_id": 7,
+    "name": "Катерина Іванова",
+    "email": "kateryna.ivanova.test@gmail.com",
+    "role": "client",
+    "rating": 0.0,
+    "services_offered": [],
+    "password": "client111",
+    "created_at": "2026-03-20T10:00:00Z"
+  },
+  {
+    "_id": 8,
+    "name": "Олег Бондаренко",
+    "email": "oleh.bondarenko.test@gmail.com",
+    "role": "client",
+    "rating": 0.0,
+    "services_offered": [],
+    "password": "client222",
+    "created_at": "2026-03-20T10:05:00Z"
+  },
+  {
+    "_id": 9,
+    "name": "Софія Романюк",
+    "email": "sofiia.romaniuk.test@gmail.com",
+    "role": "client",
+    "rating": 0.0,
+    "services_offered": [],
+    "password": "client333",
+    "created_at": "2026-03-20T10:10:00Z"
+  },
+  {
+    "_id": 10,
+    "name": "Назар Мельничук",
+    "email": "nazar.melnychuk.test@gmail.com",
+    "role": "client",
+    "rating": 0.0,
+    "services_offered": [],
+    "password": "client444",
+    "created_at": "2026-03-20T10:15:00Z"
+  }
+]

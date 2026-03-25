@@ -1,0 +1,82 @@
+[
+  {
+    "_id": 1,
+    "booking_id": "1",
+    "amount": 520.0,
+    "method": "card",
+    "status": "paid",
+    "paid_at": "2026-03-24T10:06:00Z"
+  },
+  {
+    "_id": 2,
+    "booking_id": "2",
+    "amount": 350.0,
+    "method": "cash",
+    "status": "unpaid",
+    "paid_at": null
+  },
+  {
+    "_id": 3,
+    "booking_id": "3",
+    "amount": 600.0,
+    "method": "card",
+    "status": "paid",
+    "paid_at": "2026-03-24T10:12:00Z"
+  },
+  {
+    "_id": 4,
+    "booking_id": "4",
+    "amount": 1200.0,
+    "method": "card",
+    "status": "paid",
+    "paid_at": "2026-03-24T11:45:00Z"
+  },
+  {
+    "_id": 5,
+    "booking_id": "5",
+    "amount": 950.0,
+    "method": "card",
+    "status": "paid",
+    "paid_at": "2026-03-24T11:15:00Z"
+  },
+  {
+    "_id": 6,
+    "booking_id": "6",
+    "amount": 300.0,
+    "method": "cash",
+    "status": "unpaid",
+    "paid_at": null
+  },
+  {
+    "_id": 7,
+    "booking_id": "7",
+    "amount": 800.0,
+    "method": "card",
+    "status": "paid",
+    "paid_at": "2026-03-24T11:10:00Z"
+  },
+  {
+    "_id": 8,
+    "booking_id": "8",
+    "amount": 1100.0,
+    "method": "card",
+    "status": "paid",
+    "paid_at": "2026-03-24T13:45:00Z"
+  },
+  {
+    "_id": 9,
+    "booking_id": "9",
+    "amount": 550.0,
+    "method": "cash",
+    "status": "unpaid",
+    "paid_at": null
+  },
+  {
+    "_id": 10,
+    "booking_id": "10",
+    "amount": 450.0,
+    "method": "card",
+    "status": "paid",
+    "paid_at": "2026-03-24T12:25:00Z"
+  }
+]

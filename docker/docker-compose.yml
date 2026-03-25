@@ -1,0 +1,29 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: beauty-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../backend/.env
+    depends_on:
+      - mongo
+    volumes:
+      - ../backend:/app
+    restart: always
+
+  mongo:
+    image: mongo:7.0
+    container_name: beauty-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: beauty_salon_db
+    volumes:
+      - mongo_data:/data/db
+    restart: always
+
+volumes:
+  mongo_data:
