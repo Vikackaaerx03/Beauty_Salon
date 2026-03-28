@@ -1,7 +1,7 @@
 [
   {
     "_id": 1,
-    "booking_id": "1",
+    "booking_id": 1,
     "amount": 520.0,
     "method": "card",
     "status": "paid",
@@ -9,7 +9,7 @@
   },
   {
     "_id": 2,
-    "booking_id": "2",
+    "booking_id": 2,
     "amount": 350.0,
     "method": "cash",
     "status": "unpaid",
@@ -17,7 +17,7 @@
   },
   {
     "_id": 3,
-    "booking_id": "3",
+    "booking_id": 3,
     "amount": 600.0,
     "method": "card",
     "status": "paid",
@@ -25,7 +25,7 @@
   },
   {
     "_id": 4,
-    "booking_id": "4",
+    "booking_id": 4,
     "amount": 1200.0,
     "method": "card",
     "status": "paid",
@@ -33,7 +33,7 @@
   },
   {
     "_id": 5,
-    "booking_id": "5",
+    "booking_id": 5,
     "amount": 950.0,
     "method": "card",
     "status": "paid",
@@ -41,7 +41,7 @@
   },
   {
     "_id": 6,
-    "booking_id": "6",
+    "booking_id": 6,
     "amount": 300.0,
     "method": "cash",
     "status": "unpaid",
@@ -49,7 +49,7 @@
   },
   {
     "_id": 7,
-    "booking_id": "7",
+    "booking_id": 7,
     "amount": 800.0,
     "method": "card",
     "status": "paid",
@@ -57,7 +57,7 @@
   },
   {
     "_id": 8,
-    "booking_id": "8",
+    "booking_id": 8,
     "amount": 1100.0,
     "method": "card",
     "status": "paid",
@@ -65,7 +65,7 @@
   },
   {
     "_id": 9,
-    "booking_id": "9",
+    "booking_id": 9,
     "amount": 550.0,
     "method": "cash",
     "status": "unpaid",
@@ -73,7 +73,7 @@
   },
   {
     "_id": 10,
-    "booking_id": "10",
+    "booking_id": 10,
     "amount": 450.0,
     "method": "card",
     "status": "paid",

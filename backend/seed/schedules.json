@@ -1,87 +1,87 @@
 [
   {
     "_id": 1,
-    "master_id": "2",
+    "master_id": 2,
     "start": "2026-03-24T09:00:00Z",
     "end": "2026-03-24T10:00:00Z",
     "status": "booked",
-    "booking_id": "1"
+    "booking_id": 1
   },
   {
     "_id": 2,
-    "master_id": "2",
+    "master_id": 2,
     "start": "2026-03-24T10:30:00Z",
     "end": "2026-03-24T11:30:00Z",
     "status": "booked",
-    "booking_id": "2"
+    "booking_id": 2
   },
   {
     "_id": 3,
-    "master_id": "3",
+    "master_id": 3,
     "start": "2026-03-24T09:00:00Z",
     "end": "2026-03-24T10:00:00Z",
     "status": "booked",
-    "booking_id": "3"
+    "booking_id": 3
   },
   {
     "_id": 4,
-    "master_id": "3",
+    "master_id": 3,
     "start": "2026-03-24T10:30:00Z",
     "end": "2026-03-24T11:30:00Z",
     "status": "booked",
-    "booking_id": "4"
+    "booking_id": 4
   },
   {
     "_id": 5,
-    "master_id": "4",
+    "master_id": 4,
     "start": "2026-03-24T09:00:00Z",
     "end": "2026-03-24T11:00:00Z",
     "status": "booked",
-    "booking_id": "5"
+    "booking_id": 5
   },
   {
     "_id": 6,
-    "master_id": "4",
+    "master_id": 4,
     "start": "2026-03-24T11:30:00Z",
     "end": "2026-03-24T12:00:00Z",
     "status": "booked",
-    "booking_id": "6"
+    "booking_id": 6
   },
   {
     "_id": 7,
-    "master_id": "5",
+    "master_id": 5,
     "start": "2026-03-24T10:00:00Z",
     "end": "2026-03-24T11:00:00Z",
     "status": "booked",
-    "booking_id": "7"
+    "booking_id": 7
   },
   {
     "_id": 8,
-    "master_id": "5",
+    "master_id": 5,
     "start": "2026-03-24T12:00:00Z",
     "end": "2026-03-24T13:30:00Z",
     "status": "booked",
-    "booking_id": "8"
+    "booking_id": 8
   },
   {
     "_id": 9,
-    "master_id": "6",
+    "master_id": 6,
     "start": "2026-03-24T09:30:00Z",
     "end": "2026-03-24T10:45:00Z",
     "status": "booked",
-    "booking_id": "9"
+    "booking_id": 9
   },
   {
     "_id": 10,
-    "master_id": "6",
+    "master_id": 6,
     "start": "2026-03-24T11:15:00Z",
     "end": "2026-03-24T12:15:00Z",
     "status": "booked",
-    "booking_id": "10"
+    "booking_id": 10
   },
   {
     "_id": 11,
-    "master_id": "2",
+    "master_id": 2,
     "start": "2026-03-24T12:00:00Z",
     "end": "2026-03-24T13:00:00Z",
     "status": "free",
@@ -89,7 +89,7 @@
   },
   {
     "_id": 12,
-    "master_id": "3",
+    "master_id": 3,
     "start": "2026-03-24T12:00:00Z",
     "end": "2026-03-24T13:00:00Z",
     "status": "free",
@@ -97,7 +97,7 @@
   },
   {
     "_id": 13,
-    "master_id": "4",
+    "master_id": 4,
     "start": "2026-03-24T12:30:00Z",
     "end": "2026-03-24T13:30:00Z",
     "status": "free",
@@ -105,7 +105,7 @@
   },
   {
     "_id": 14,
-    "master_id": "5",
+    "master_id": 5,
     "start": "2026-03-24T14:00:00Z",
     "end": "2026-03-24T15:00:00Z",
     "status": "free",
@@ -113,7 +113,7 @@
   },
   {
     "_id": 15,
-    "master_id": "6",
+    "master_id": 6,
     "start": "2026-03-24T13:00:00Z",
     "end": "2026-03-24T14:00:00Z",
     "status": "free",

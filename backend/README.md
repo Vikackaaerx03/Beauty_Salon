@@ -62,9 +62,9 @@
 
 Файли з прикладами даних лежать у `backend/seed/`.
 
-Імпорт у Docker-контейнер (приклад):
-- `docker cp backend/seed/users.json beauty-mongo:/seed/users.json`
-- `docker exec -it beauty-mongo mongoimport --db beauty_salon_db --collection users --file /seed/users.json --jsonArray --drop`
+Імпорт у Docker-контейнер (приклад, використовуємо `/tmp`):
+- `docker cp backend/seed/users.json beauty-mongo:/tmp/users.json`
+- `docker exec -it beauty-mongo mongoimport --db beauty_salon_db --collection users --file /tmp/users.json --jsonArray --drop`
 
 Аналогічно для:
 - `services.json` → `services`
@@ -73,8 +73,7 @@
 - `payments.json` → `payments`
 - `feedback.json` → `feedback`
 
-Примітка: у `users.json` є поле `password` лише для зручності перегляду. Після імпорту краще прибрати його:
-- `db.users.updateMany({}, { $unset: { password: "" } })`
+Примітка: паролі не зберігаються у відкритому вигляді. У `users.json` використовується поле `password_hash`.
 
 ## Тестування базових операцій з БД (pytest)
 

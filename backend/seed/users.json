@@ -2,101 +2,129 @@
   {
     "_id": 1,
     "name": "Victoria Roslav",
-    "email": "vikaroslav.test@gmail.com",
+    "email": "victoria.roslav@beauty.local",
     "role": "admin",
     "rating": 0.0,
     "services_offered": [],
-    "password": "admin123",
-    "created_at": "2026-03-20T09:00:00Z"
+    "created_at": "2026-03-20T09:00:00Z",
+    "password_hash": "pbkdf2_sha256$200000$a3yUMph3wPkubW-yh7xuZA$CKPMZLhqsp3JnCglgCuqUiPpbxk5Grh5MSk1JpaUJD0"
   },
   {
     "_id": 2,
     "name": "Олена Гринюк",
-    "email": "olena.hryniuk.test@gmail.com",
+    "email": "olena.hryniuk@beauty.local",
     "role": "master",
     "rating": 4.9,
-    "services_offered": ["1", "3", "5", "11", "13"],
-    "password": "master111",
-    "created_at": "2026-03-20T09:10:00Z"
+    "services_offered": [
+      1,
+      3,
+      5,
+      11,
+      13
+    ],
+    "created_at": "2026-03-20T09:10:00Z",
+    "password_hash": "pbkdf2_sha256$200000$rC2zUcMpsjPLeacrc5pGGw$khBk8qI9IrbPxsmHbLNC4y7AdAr950S2aDmrTDFsZms"
   },
   {
     "_id": 3,
     "name": "Іван Шевченко",
-    "email": "ivan.shevchenko.test@gmail.com",
+    "email": "ivan.shevchenko@beauty.local",
     "role": "master",
     "rating": 4.7,
-    "services_offered": ["7", "8", "9", "10", "14"],
-    "password": "master222",
-    "created_at": "2026-03-20T09:15:00Z"
+    "services_offered": [
+      7,
+      8,
+      9,
+      10,
+      14
+    ],
+    "created_at": "2026-03-20T09:15:00Z",
+    "password_hash": "pbkdf2_sha256$200000$fLlgT7dz5iRGmvfJze-VKA$TUcDR5acfFjr3bzH5ewxSalskOyTxkw0S1McpOFeG6g"
   },
   {
     "_id": 4,
     "name": "Марія Коваль",
-    "email": "maria.koval.test@gmail.com",
+    "email": "maria.koval@beauty.local",
     "role": "master",
     "rating": 4.8,
-    "services_offered": ["4", "5", "6", "20"],
-    "password": "master333",
-    "created_at": "2026-03-20T09:20:00Z"
+    "services_offered": [
+      4,
+      5,
+      6,
+      20
+    ],
+    "created_at": "2026-03-20T09:20:00Z",
+    "password_hash": "pbkdf2_sha256$200000$6mmxrlCQTJ5HeUoIGgA26w$k4L081923LVcR0kIAZh2097mQHkK1xO5tFu3oZaQ6wY"
   },
   {
     "_id": 5,
     "name": "Анна Мельник",
-    "email": "anna.melnyk.test@gmail.com",
+    "email": "anna.melnyk@beauty.local",
     "role": "master",
     "rating": 4.6,
-    "services_offered": ["15", "16", "17", "18", "19"],
-    "password": "master444",
-    "created_at": "2026-03-20T09:25:00Z"
+    "services_offered": [
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "created_at": "2026-03-20T09:25:00Z",
+    "password_hash": "pbkdf2_sha256$200000$aQivOkTLEUzon_nvgBwFAA$r-xSJP37256dWrutPHfPe9JGTCASRUrWCt-FONzM3Tg"
   },
   {
     "_id": 6,
     "name": "Дмитро Савчук",
-    "email": "dmytro.savchuk.test@gmail.com",
+    "email": "dmytro.savchuk@beauty.local",
     "role": "master",
     "rating": 4.5,
-    "services_offered": ["2", "12", "1", "3"],
-    "password": "master555",
-    "created_at": "2026-03-20T09:30:00Z"
+    "services_offered": [
+      2,
+      12,
+      1,
+      3
+    ],
+    "created_at": "2026-03-20T09:30:00Z",
+    "password_hash": "pbkdf2_sha256$200000$Mlgx0mLcJwwFA7Y2R3JN6A$OMdIdlNSO_DTisBwXYtRxy_HfQPfEsonGTgK7uuMOYU"
   },
   {
     "_id": 7,
     "name": "Катерина Іванова",
-    "email": "kateryna.ivanova.test@gmail.com",
+    "email": "kateryna.ivanova@beauty.local",
     "role": "client",
     "rating": 0.0,
     "services_offered": [],
-    "password": "client111",
-    "created_at": "2026-03-20T10:00:00Z"
+    "created_at": "2026-03-20T10:00:00Z",
+    "password_hash": "pbkdf2_sha256$200000$HIejGTduwoRg6c-hYLYd0w$HAGWmJ4MFuIOA2njJgtQjrerzCI_e4Bzt4oLPqgzw44"
   },
   {
     "_id": 8,
     "name": "Олег Бондаренко",
-    "email": "oleh.bondarenko.test@gmail.com",
+    "email": "oleh.bondarenko@beauty.local",
     "role": "client",
     "rating": 0.0,
     "services_offered": [],
-    "password": "client222",
-    "created_at": "2026-03-20T10:05:00Z"
+    "created_at": "2026-03-20T10:05:00Z",
+    "password_hash": "pbkdf2_sha256$200000$1yolydOsBZywWycOM29DHA$aJAZT0Di-hohytpb7ioJcJk5vSQU-w9HeodC3Ef5BQs"
   },
   {
     "_id": 9,
     "name": "Софія Романюк",
-    "email": "sofiia.romaniuk.test@gmail.com",
+    "email": "sofiia.romaniuk@beauty.local",
     "role": "client",
     "rating": 0.0,
     "services_offered": [],
-    "password": "client333",
-    "created_at": "2026-03-20T10:10:00Z"
+    "created_at": "2026-03-20T10:10:00Z",
+    "password_hash": "pbkdf2_sha256$200000$eKpDgZZAsEJ5_eMjWkWxXA$ITLN56v8arf8KPrDaccI493AM2ORltNK7vsOcCSRoNw"
   },
   {
     "_id": 10,
     "name": "Назар Мельничук",
-    "email": "nazar.melnychuk.test@gmail.com",
+    "email": "nazar.melnychuk@beauty.local",
     "role": "client",
     "rating": 0.0,
     "services_offered": [],
-    "password": "client444",
-    "created_at": "2026-03-20T10:15:00Z"
+    "created_at": "2026-03-20T10:15:00Z",
+    "password_hash": "pbkdf2_sha256$200000$e-2IR8_YfqESYerJdrO3Tw$ahROPgltwtfiwt5WbB3vXYKOlMmGU5_ZrQwu3HNpmEo"
   }
 ]

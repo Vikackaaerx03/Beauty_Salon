@@ -1,21 +1,18 @@
 from pymongo.collection import Collection
 from datetime import datetime
-import hashlib
 from typing import Optional
 from app.db.database import to_mongo_id
+from app.core.security import hash_password
 from app.schemas.user_schema import UserCreate, UserUpdate
 
 class UserRepository:
     def __init__(self, collection: Collection):
         self.collection = collection
 
-    def _hash_password(self, password: str) -> str:
-        return hashlib.sha256(password.encode("utf-8")).hexdigest()
-
     def create(self, user: UserCreate) -> str:
         doc = user.model_dump()
         password = doc.pop("password")
-        doc["password_hash"] = self._hash_password(password)
+        doc["password_hash"] = hash_password(password)
         doc["created_at"] = datetime.utcnow()
         return str(self.collection.insert_one(doc).inserted_id)
 
@@ -55,7 +52,7 @@ class UserRepository:
     def update(self, user_id: str, user: UserUpdate) -> int:
         doc = user.model_dump(exclude_unset=True)
         if "password" in doc:
-            doc["password_hash"] = self._hash_password(doc.pop("password"))
+            doc["password_hash"] = hash_password(doc.pop("password"))
         result = self.collection.update_one({"_id": to_mongo_id(user_id)}, {"$set": doc})
         return result.modified_count
 
