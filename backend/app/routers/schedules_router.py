@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from app.core.security import get_current_admin, logger
 from app.db.database import get_schedules_collection
 from app.repositories.schedules_repository import ScheduleRepository
 from app.services.schedules_service import SchedulesService
@@ -12,8 +13,14 @@ def get_schedules_service(collection=Depends(get_schedules_collection)) -> Sched
 
 
 @router.post("", response_model=TimeslotDB, status_code=status.HTTP_201_CREATED)
-def create_timeslot(payload: TimeslotCreate, service: SchedulesService = Depends(get_schedules_service)):
-    return service.create(payload)
+def create_timeslot(
+    payload: TimeslotCreate,
+    service: SchedulesService = Depends(get_schedules_service),
+    current_admin: dict = Depends(get_current_admin),
+):
+    created = service.create(payload)
+    logger.info("Адмін %s створив слот %s", current_admin.get("email"), created)
+    return created
 
 
 @router.get("", response_model=list[TimeslotDB])
@@ -34,16 +41,28 @@ def get_timeslot(timeslot_id: str, service: SchedulesService = Depends(get_sched
 
 
 @router.patch("/{timeslot_id}", response_model=TimeslotDB)
-def update_timeslot(timeslot_id: str, payload: TimeslotUpdate, service: SchedulesService = Depends(get_schedules_service)):
+def update_timeslot(
+    timeslot_id: str,
+    payload: TimeslotUpdate,
+    service: SchedulesService = Depends(get_schedules_service),
+    current_admin: dict = Depends(get_current_admin),
+):
     try:
-        return service.update(timeslot_id, payload)
+        updated = service.update(timeslot_id, payload)
+        logger.info("Адмін %s оновив слот %s", current_admin.get("email"), timeslot_id)
+        return updated
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
 
 
 @router.delete("/{timeslot_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_timeslot(timeslot_id: str, service: SchedulesService = Depends(get_schedules_service)):
+def delete_timeslot(
+    timeslot_id: str,
+    service: SchedulesService = Depends(get_schedules_service),
+    current_admin: dict = Depends(get_current_admin),
+):
     try:
         service.delete(timeslot_id)
+        logger.info("Адмін %s видалив слот %s", current_admin.get("email"), timeslot_id)
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc))

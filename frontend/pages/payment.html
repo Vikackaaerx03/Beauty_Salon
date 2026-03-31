@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Оплата | Beauty Space</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-main">
+    <header class="navbar">
+        <a href="admin.html" class="logo">ADMIN PANEL</a>
+        <nav class="nav-links"><a href="#" onclick="logout()">ВИЙТИ</a></nav>
+    </header>
+
+    <div class="container" style="max-width: 500px; text-align: center;">
+        <h2>Проведення оплати</h2>
+        <form id="paymentForm">
+            <input type="hidden" id="bookingId">
+            
+            <div style="margin-bottom: 30px; text-align: left; background: #f9f9f9; padding: 20px; border-radius: 4px;">
+                <p style="margin: 5px 0;"><strong>Запис №:</strong> <span id="displayBookingId">...</span></p>
+                <p style="margin: 5px 0;"><strong>Сума до сплати:</strong> <span id="amountToPay">0</span> грн</p>
+            </div>
+
+            <label style="font-size: 12px; letter-spacing: 1px; display: block; text-align: left;">СПОСІБ ОПЛАТИ:</label>
+            <select id="paymentMethod" required>
+                <option value="cash">Готівка</option>
+                <option value="card">Банківська картка</option>
+            </select>
+            
+            <button type="submit" class="btn-premium" style="width: 100%;">ПІДТВЕРДИТИ ОПЛАТУ</button>
+        </form>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        if (localStorage.getItem("role") !== "admin") {
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+</html>

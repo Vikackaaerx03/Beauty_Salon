@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель Адміністратора | Beauty Space</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-admin">
+    <header class="navbar">
+        <a href="admin.html" class="logo">ADMIN PANEL</a>
+        <nav class="nav-links">
+            <a href="#" onclick="logout(); return false;" class="nav-link">ВИЙТИ</a>
+        </nav>
+    </header>
+
+    <div id="adminModal" class="modal">
+        <div class="modal-content" style="max-height: 85vh; overflow-y: auto;">
+            <h2 id="modalTitle" style="font-size: 18px; margin-bottom: 20px;">Редагування</h2>
+            <div id="validationError" style="display:none; color: white; background: #dc3545; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-size: 12px;"></div>
+            <form id="adminForm">
+                <div id="formFields"></div>
+                <div style="margin-top: 25px; display: flex; gap: 10px;">
+                    <button type="submit" class="btn-premium" style="flex: 1;">ЗБЕРЕГТИ</button>
+                    <button type="button" onclick="closeModal()" class="btn-outline" style="flex: 1;">СКАСУВАТИ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container" style="max-width: 1400px; background: transparent; box-shadow: none; margin-top: 20px;">
+        <h1 style="color: white; text-shadow: 2px 2px 8px rgba(0,0,0,0.5); letter-spacing: 4px; margin-bottom: 40px; text-align: center;">УПРАВЛІННЯ САЛОНОМ</h1>
+
+        <div class="admin-grid">
+            <section class="admin-section">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <h3>БРОНЮВАННЯ</h3>
+                    <button class="btn-add-main" onclick="openAddModal('bookings')">+</button>
+                </div>
+                <div class="table-wrapper"><table class="admin-table" id="bookingsTable"></table></div>
+            </section>
+
+            <section class="admin-section">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <h3>ПЛАТЕЖІ</h3>
+                    <button class="btn-add-main" onclick="openAddModal('payments')">+</button>
+                </div>
+                <div class="table-wrapper"><table class="admin-table" id="paymentsTable"></table></div>
+            </section>
+
+            <section class="admin-section">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <h3>КОРИСТУВАЧІ</h3>
+                    <button class="btn-add-main" onclick="openAddModal('users')">+</button>
+                </div>
+                <div class="table-wrapper"><table class="admin-table" id="usersTable"></table></div>
+            </section>
+
+            <section class="admin-section">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <h3>ПОСЛУГИ</h3>
+                    <button class="btn-add-main" onclick="openAddModal('services')">+</button>
+                </div>
+                <div class="table-wrapper"><table class="admin-table" id="servicesTable"></table></div>
+            </section>
+
+            <section class="admin-section">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <h3>РОЗКЛАД</h3>
+                    <button class="btn-add-main" onclick="openAddModal('schedules')">+</button>
+                </div>
+                <div class="table-wrapper"><table class="admin-table" id="schedulesTable"></table></div>
+            </section>
+
+            <section class="admin-section">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <h3>ВІДГУКИ</h3>
+                    <button class="btn-add-main" onclick="openAddModal('feedback')">+</button>
+                </div>
+                <div class="table-wrapper"><table class="admin-table" id="feedbackTable"></table></div>
+            </section>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>

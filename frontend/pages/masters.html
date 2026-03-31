@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Наші Майстри | Beauty Salon</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-main">
+    <header class="navbar">
+        <a href="../index.html" class="logo">Beauty Salon</a>
+        <nav class="nav-links">
+            <a href="masters.html">Майстри</a>
+            <a href="booking.html">Запис</a>
+            <a href="login.html">Увійти</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>Наші Спеціалісти</h1>
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+            <select id="sortMasters" style="width: auto;">
+                <option value="name">За ім'ям</option>
+                <option value="rating">За рейтингом</option>
+            </select>
+        </div>
+        
+        <div id="mastersGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+            </div>
+    </div>
+    <script src="../js/api.js"></script>
+    <script src="../js/master.js"></script>
+</body>
+</html>

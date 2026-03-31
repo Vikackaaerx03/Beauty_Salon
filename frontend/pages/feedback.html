@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Залишити відгук</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-main">
+    <div class="container" style="max-width: 500px; text-align: center;">
+        <h2>Оцініть свій візит</h2>
+        <p style="font-size: 14px; margin-bottom: 30px;">Ми прагнемо ставати кращими для вас.</p>
+        
+        <form id="feedbackForm">
+            <select id="rating" style="text-align: center; font-size: 18px;" required>
+                <option value="5">⭐⭐⭐⭐⭐ Відмінно</option>
+                <option value="4">⭐⭐⭐⭐ Добре</option>
+                <option value="3">⭐⭐⭐ Нормально</option>
+                <option value="2">⭐⭐ Погано</option>
+                <option value="1">⭐ Жахливо</option>
+            </select>
+            
+            <textarea id="comment" placeholder="Ваші враження (необов'язково)" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; font-family: inherit; margin-bottom: 20px;"></textarea>
+            
+            <button type="submit" class="btn-premium" style="width: 100%;">НАДІСЛАТИ ВІДГУК</button>
+        </form>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script>
+        document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                rating: parseInt(document.getElementById('rating').value),
+                comment: document.getElementById('comment').value
+            };
+            try {
+                await request("/feedback", "POST", data); // Зміни роут під свій бекенд
+                alert("Дякуємо за ваш відгук!");
+                window.location.href = "../index.html";
+            } catch (error) {}
+        });
+    </script>
+</body>
+</html>

@@ -3,11 +3,11 @@ from datetime import datetime
 from pydantic import BaseModel
 
 class BookingBase(BaseModel):
-    client_id: str
+    client_id: str | None = None
     master_id: str
     service_id: str
     timeslot_id: str
-    status: str = "pending"  # pending, confirmed, completed, canceled
+    status: str = "pending" 
 
 
 class BookingCreate(BookingBase):

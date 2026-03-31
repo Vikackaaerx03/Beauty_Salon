@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Beauty Salon | Твоя Б'юті-Територія</title>
+    <link rel="stylesheet" href="css/style.css?">
+</head>
+<body class="bg-main">
+    <header class="navbar">
+        <a href="index.html" class="logo">Beauty Salon</a>
+        
+        <nav class="nav-links" style="flex-grow: 1; text-align: center;">
+            <a href="pages/masters.html">МАЙСТРИ</a>
+            <a href="pages/masters.html" id="masterLink" style="display: none;">МІЙ РОЗКЛАД</a>
+            <a href="pages/admin.html" id="adminLink" style="display: none;">АДМІН ПАНЕЛЬ</a>
+        </nav>
+
+        <div class="auth-buttons" id="guestButtons">
+            <a href="pages/login.html" class="btn-outline">УВІЙТИ</a>
+            <a href="pages/register.html" class="btn-premium" style="text-decoration: none; padding: 11px 25px;">РЕЄСТРАЦІЯ</a>
+        </div>
+
+        <div class="auth-buttons" id="userButtons" style="display: none;">
+            <a href="#" onclick="window.logout()" class="btn-outline">ВИЙТИ</a>
+        </div>
+    </header>
+
+    <div class="container" style="text-align: center; margin-top: 15vh; background: transparent; box-shadow: none;">
+        <h1 style="font-size: 48px; letter-spacing: 5px; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">СТАНЬ КРАЩОЮ ВЕРСІЄЮ СЕБЕ</h1>
+        <br>
+        <button id="heroBookingBtn" class="btn-premium">ЗАПИСАТИСЯ ОНЛАЙН</button>
+    </div>
+
+    <footer style="background: var(--primary-dark); color: white; padding: 40px 60px; margin-top: 20vh; text-align: center;">
+        <h3 style="font-family: 'Playfair Display', serif; margin-bottom: 10px;">Beauty Space</h3>
+        <p style="font-size: 12px; opacity: 0.7;">© 2026 Victoria Roslav</p>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/index.js"></script> </body>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Запис | Beauty Salon</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-main">
+    <header class="navbar">
+        <a href="../index.html" class="logo">Beauty Salon</a>
+        <nav class="nav-links"><a href="#" onclick="localStorage.clear(); location.href='../index.html'">ВИЙТИ</a></nav>
+    </header>
+
+    <div class="container" style="max-width: 600px;">
+        <h2>Оформлення Запису</h2>
+        <form id="bookingForm">
+            <label style="font-size: 11px; letter-spacing: 1px; text-transform: uppercase;">Оберіть послугу:</label>
+            <select id="serviceSelect" required><option value="">Завантаження послуг...</option></select>
+            
+            <label style="font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-top: 15px; display: block;">Оберіть майстра:</label>
+            <select id="masterSelect" required><option value="">Завантаження майстрів...</option></select>
+            
+            <label style="font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-top: 15px; display: block;">Оберіть доступний час:</label>
+            <select id="timeslotSelect" required>
+                <option value="">Спочатку оберіть майстра...</option>
+            </select>
+            
+            <button type="submit" class="btn-premium" style="width: 100%; margin-top: 30px;">ПІДТВЕРДИТИ ЗАПИС</button>
+        </form>
+    </div>
+    
+    <script src="../js/api.js"></script>
+    <script src="../js/booking.js"></script>
+    <script>
+        if (localStorage.getItem("role") !== "client") {
+            alert("Ця сторінка лише для клієнтів");
+            window.location.href = "../index.html";
+        }
+    </script>
+</body>
+</html>

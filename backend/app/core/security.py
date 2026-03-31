@@ -3,9 +3,12 @@ from __future__ import annotations
 import base64
 import hashlib
 import hmac
+import logging
 import secrets
 from typing import Any
 
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 
 from app.core.config import get_settings
@@ -26,25 +29,17 @@ def _b64decode(data: str) -> bytes:
 
 
 def hash_password(password: str) -> str:
-    """Hash a password for storage.
-
-    Uses PBKDF2-HMAC-SHA256 with a per-password random salt.
-    Stored format: `pbkdf2_sha256$<iterations>$<salt_b64>$<hash_b64>`
-    """
+    """Hash a password for storage."""
     salt = secrets.token_bytes(_PBKDF2_SALT_BYTES)
     dk = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, _PBKDF2_ITERATIONS)
     return f"{_PBKDF2_ALG}${_PBKDF2_ITERATIONS}${_b64encode(salt)}${_b64encode(dk)}"
 
 
 def verify_password(password: str, password_hash: str) -> bool:
-    """Verify a password against a stored hash.
-
-    Supports the current PBKDF2 format and legacy SHA256 hex digests (for backwards compatibility).
-    """
+    """Verify a password against a stored hash."""
     if not isinstance(password_hash, str) or not password_hash:
         return False
 
-    # Current format: pbkdf2_sha256$iterations$salt$hash
     if password_hash.startswith(f"{_PBKDF2_ALG}$"):
         try:
             _, iterations_str, salt_b64, hash_b64 = password_hash.split("$", 3)
@@ -57,7 +52,6 @@ def verify_password(password: str, password_hash: str) -> bool:
         candidate = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
         return hmac.compare_digest(candidate, expected)
 
-    # Legacy: plain SHA256 hex digest
     if len(password_hash) == 64 and all(c in "0123456789abcdef" for c in password_hash.lower()):
         candidate = hashlib.sha256(password.encode("utf-8")).hexdigest()
         return hmac.compare_digest(candidate, password_hash)
@@ -80,3 +74,73 @@ def decode_access_token(token: str, max_age_seconds: int) -> dict[str, Any] | No
         return data if isinstance(data, dict) else None
     except (BadSignature, SignatureExpired):
         return None
+
+
+# --- FastAPI Authorization Dependencies ---
+
+oauth2_scheme = HTTPBearer()
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(oauth2_scheme)) -> dict:
+    token = credentials.credentials
+    settings = get_settings()
+    
+    payload = decode_access_token(token, settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Недійсний або прострочений токен",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return {"id": payload.get("sub"), "role": payload.get("role")}
+
+
+def get_current_client(user: dict = Depends(get_current_user)) -> dict:
+    if user.get("role") != "client":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Доступ заборонено. Тільки для клієнтів."
+        )
+    return user
+
+
+def get_current_admin(user: dict = Depends(get_current_user)) -> dict:
+    if user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Доступ заборонено. Тільки для адміністраторів."
+        )
+    return user
+
+
+def get_current_master_or_admin(user: dict = Depends(get_current_user)) -> dict:
+    if user.get("role") not in ["master", "admin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Доступ заборонено. Тільки для майстрів або адміністраторів."
+        )
+    return user
+
+
+# --- Logger Setup ---
+
+logger = logging.getLogger("beauty_salon")
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s [%(filename)s:%(lineno)d] %(levelname)s %(message)s")
+    )
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+
+
+__all__ = [
+    "hash_password",
+    "verify_password",
+    "create_access_token",
+    "decode_access_token",
+    "logger",
+    "get_current_user",
+    "get_current_client",
+    "get_current_admin",
+    "get_current_master_or_admin",
+]

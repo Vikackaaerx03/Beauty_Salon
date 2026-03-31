@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Вхід | Beauty Salon</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-auth">
+    <div class="container" style="max-width: 400px; margin-top: 10vh;">
+        <a href="../index.html" class="back-link">&larr; НА ГОЛОВНУ</a>
+        <h2>Авторизація</h2>
+        
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="E-MAIL" required>
+            <input type="password" id="password" placeholder="ПАРОЛЬ" required>
+            
+            <div id="loginError" class="form-error" aria-live="polite" role="alert" style="display:none; color: #dc3545; font-size: 12px; margin-bottom: 15px; text-align: center;"></div>
+            
+            <button type="submit" class="btn-premium" style="width: 100%;">УВІЙТИ</button>
+        </form>
+
+        <p style="text-align: center; font-size: 12px; margin-top: 20px;">
+            Немає аккаунту? <a href="register.html" style="color: black; font-weight: bold;">ЗАРЕЄСТРУВАТИСЯ</a>
+        </p>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/login.js"></script>
+</body>
+</html>

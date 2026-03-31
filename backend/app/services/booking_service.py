@@ -11,6 +11,9 @@ class BookingService:
         self.schedules = schedules
 
     def create(self, payload: BookingCreate) -> dict:
+        if not payload.client_id:
+            raise ValueError("Client ID is required")
+
         timeslot = self.schedules.get_by_id(payload.timeslot_id)
         if timeslot is None:
             raise ValueError("Timeslot not found")

@@ -1,18 +1,30 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, field_validator
 
-from app.schemas.user_schema import UserDB
+from app.schemas.user_schema import UserDB, UserRole, _ensure_valid_email
 
 
 class AuthLogin(BaseModel):
-    email: EmailStr
+    email: str
     password: str
+
+    @field_validator("email")
+    def validate_email(cls, value: str) -> str:
+        cleaned = _ensure_valid_email(value)
+        assert cleaned is not None
+        return cleaned
 
 
 class AuthRegister(BaseModel):
     name: str
-    email: EmailStr
+    email: str
     password: str
-    role: str = "client"  # guest, client, admin, master
+    role: UserRole = "client"
+
+    @field_validator("email")
+    def validate_email(cls, value: str) -> str:
+        cleaned = _ensure_valid_email(value)
+        assert cleaned is not None
+        return cleaned
 
 
 class TokenResponse(BaseModel):
