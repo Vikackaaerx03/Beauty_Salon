@@ -1,14 +1,15 @@
-﻿async function request(endpoint, method = "GET", body = null) {
+async function request(endpoint, method = "GET", body = null) {
     const token = localStorage.getItem("access_token");
     const url = `http://127.0.0.1:8000${endpoint}`;
-    
-    const headers = { "Content-Type": "application/json" };
+
+    const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
+    const headers = isFormData ? {} : { "Content-Type": "application/json" };
     if (token) {
         headers["Authorization"] = `Bearer ${token}`;
     }
 
     const config = { method, headers };
-    if (body) config.body = JSON.stringify(body);
+    if (body) config.body = isFormData ? body : JSON.stringify(body);
 
     try {
         const response = await fetch(url, config);
@@ -22,11 +23,11 @@
         } catch (e) {
             data = { detail: text };
         }
-        
+
         if (!response.ok) {
-            const error = new Error(typeof data?.detail === 'string' ? data.detail : "Помилка валідації");
+            const error = new Error(typeof data?.detail === "string" ? data.detail : "Помилка валідації");
             error.status = response.status;
-            error.detail = data?.detail; 
+            error.detail = data?.detail;
             throw error;
         }
         return data;
@@ -38,6 +39,6 @@
 
 window.logout = function() {
     localStorage.clear();
-    const path = window.location.pathname.includes('/pages/') ? '../index.html' : 'index.html';
+    const path = window.location.pathname.includes("/pages/") ? "../index.html" : "index.html";
     window.location.href = path;
 };

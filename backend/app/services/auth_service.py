@@ -1,15 +1,20 @@
 from __future__ import annotations
+
 from datetime import datetime
-from app.core.config import get_settings
+
 from app.core.security import create_access_token, verify_password
 from app.repositories.auth_repository import AuthRepository
 from app.schemas.auth_schema import AuthLogin, AuthRegister, AuthResponse, TokenResponse
+
 
 class AuthService:
     def __init__(self, repo: AuthRepository):
         self.repo = repo
 
     def register(self, payload: AuthRegister) -> AuthResponse:
+        if payload.role not in {"client", "master"}:
+            raise ValueError("Registration role must be client or master")
+
         existing = self.repo.find_by_email(payload.email)
         if existing is not None:
             raise ValueError("Email already exists")
@@ -22,8 +27,7 @@ class AuthService:
         token = self._issue_token(user_id=user_id, role=str(user.get("role", "client")))
         return AuthResponse(token=TokenResponse(access_token=token), user=user)
 
-    def login(self, payload: AuthLogin) -> dict:
-        # 1. Шукаємо користувача
+    def login(self, payload: AuthLogin) -> AuthResponse:
         user = self.repo.find_by_email(payload.email)
         if not user:
             raise ValueError("Невірний email або пароль")
@@ -32,28 +36,14 @@ class AuthService:
             raise ValueError("Невірний email або пароль")
 
         user_id = str(user.get("id") or user.get("_id"))
-        
-        token_data = {"sub": user_id, "email": user["email"], "role": user["role"]}
-        access_token = create_access_token(token_data)
+        access_token = self._issue_token(user_id=user_id, role=str(user.get("role", "client")))
+        public_user = self.repo.get_public_by_id(user_id)
 
-        return {
-            "token": {
-                "access_token": access_token,
-                "token_type": "bearer"
-            },
-            "user": {
-                "id": user_id,
-                "name": user.get("name"),
-                "email": user["email"],
-                "role": user["role"],
-                "rating": user.get("rating", 0.0),
-                "services_offered": [str(s) for s in (user.get("services_offered") or [])],
-                "created_at": user.get("created_at") or datetime.utcnow()
-            }
-        }
+        if public_user is None:
+            raise RuntimeError("Failed to load user profile")
+
+        public_user.setdefault("created_at", user.get("created_at") or datetime.utcnow())
+        return AuthResponse(token=TokenResponse(access_token=access_token), user=public_user)
 
     def _issue_token(self, user_id: str, role: str) -> str:
-        settings = get_settings()
-        return create_access_token(
-            {"sub": user_id, "role": role}
-        )
+        return create_access_token({"sub": user_id, "role": role})

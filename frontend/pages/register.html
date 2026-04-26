@@ -1,34 +1,38 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Реєстрація | Beauty Salon</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body class="bg-auth">
-    <div class="container" style="max-width: 450px; margin-top: 5vh;">
-        
-        <a href="../index.html" class="back-link">&larr; НА ГОЛОВНУ</a>
-        
-        <h2>Реєстрація</h2>
-        <form id="registerForm">
+    <main class="auth-card">
+        <a href="../index.html" class="back-link">&larr; На головну</a>
+        <p class="home-eyebrow">Реєстрація</p>
+        <h1 class="auth-title">Створити акаунт</h1>
+        <p class="auth-note">Реєстрація доступна для клієнтів і майстрів. Адмін створюється окремо.</p>
+
+        <form id="registerForm" class="auth-form">
             <input type="text" id="name" placeholder="ІМ'Я ТА ПРІЗВИЩЕ" required>
             <input type="email" id="email" placeholder="E-MAIL" required>
             <input type="password" id="password" placeholder="ПАРОЛЬ" required>
-            
-            <select id="role" style="margin-bottom: 25px;">
-                <option value="client">РЕЄСТРАЦІЯ КЛІЄНТА</option>
-                <option value="master">РЕЄСТРАЦІЯ МАЙСТРА</option>
-                <option value="admin">РЕЄСТРАЦІЯ АДМІНА</option>
+
+            <select id="role">
+                <option value="client">Реєстрація клієнта</option>
+                <option value="master">Реєстрація майстра</option>
             </select>
-            <div id="registerError" class="form-error" aria-live="polite" role="alert" style="display:none;"></div>
-            
-            <button type="submit" class="btn-premium" style="width: 100%;">СТВОРИТИ АКАУНТ</button>
+
+            <div id="registerError" class="form-error" aria-live="polite" role="alert" hidden></div>
+
+            <button type="submit" class="btn-premium btn-block">СТВОРИТИ АКАУНТ</button>
         </form>
-        <p style="text-align: center; font-size: 12px; margin-top: 25px;">
-            Вже є акаунт? <a href="login.html" style="color: black; font-weight: 500;">УВІЙТИ</a>
+
+        <p class="auth-note auth-note--center">
+            Вже є акаунт? <a href="login.html">Увійти</a>
         </p>
-    </div>
+    </main>
+
     <script src="../js/api.js"></script>
     <script src="../js/register.js"></script>
 </body>

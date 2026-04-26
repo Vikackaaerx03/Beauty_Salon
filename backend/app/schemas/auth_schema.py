@@ -1,6 +1,10 @@
+from typing import Literal
+
 from pydantic import BaseModel, field_validator
 
-from app.schemas.user_schema import UserDB, UserRole, _ensure_valid_email
+from app.schemas.user_schema import UserDB, _ensure_valid_email
+
+RegisterRole = Literal["client", "master"]
 
 
 class AuthLogin(BaseModel):
@@ -18,7 +22,7 @@ class AuthRegister(BaseModel):
     name: str
     email: str
     password: str
-    role: UserRole = "client"
+    role: RegisterRole = "client"
 
     @field_validator("email")
     def validate_email(cls, value: str) -> str:

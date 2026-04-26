@@ -2,32 +2,87 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Мій розклад | Beauty Salon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кабінет майстра | Beauty Salon</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body class="bg-main">
     <header class="navbar">
         <a href="../index.html" class="logo">Beauty Salon</a>
         <nav class="nav-links">
-            <a href="#" onclick="logout()">ВИЙТИ</a>
+            <a href="#" onclick="logout()">Вийти</a>
         </nav>
     </header>
 
-    <div class="container" style="max-width: 800px;">
-        <h2>Мій робочий розклад</h2>
-        <div id="scheduleContainer" style="margin-top: 20px;">
-            <p style="text-align: center; opacity: 0.6;">Завантаження розкладу...</p>
+    <main class="container master-dashboard">
+        <div class="master-dashboard__hero">
+            <div>
+                <p class="home-eyebrow">Особистий кабінет</p>
+                <h1 id="masterDashboardTitle" class="admin-title" style="margin: 8px 0 8px; text-align:left; text-shadow:none; color:var(--text); letter-spacing:0.04em;">Кабінет майстра</h1>
+                <p id="masterDashboardSubtitle" class="home-text" style="max-width: 70ch;">Тут ти керуєш своїми записами, профілем, аватаркою, послугами та відгуками.</p>
+                <p id="masterRatingSummary" class="home-text" style="margin-top: 10px; font-weight: 700;">Рейтинг: —</p>
+            </div>
         </div>
-    </div>
+
+        <div class="admin-grid master-dashboard__grid">
+            <section class="admin-section master-profile-panel">
+                <div class="admin-section__head">
+                    <h3>Мій профіль</h3>
+                    <span id="masterServicesBadge" class="badge status-confirmed">Послуги</span>
+                </div>
+                <form id="masterProfileForm" class="auth-form">
+                    <div class="master-profile-top">
+                        <img id="masterAvatarPreview" class="master-profile-avatar" src="../assets/images/icon_5.jpg" alt="Аватар майстра">
+                        <div class="master-avatar-picker">
+                            <label class="master-file-input">
+                                <span>Нова аватарка</span>
+                                <input id="masterAvatarFile" type="file" accept="image/*">
+                            </label>
+                            <p class="home-text">Завантаж своє фото. Воно збережеться окремим `icon_6`, `icon_7` і далі.</p>
+                        </div>
+                    </div>
+                    <input type="text" id="masterName" placeholder="Ім'я та прізвище" required>
+                    <input type="email" id="masterEmail" placeholder="E-mail" required>
+                    <label class="master-services-picker">
+                        <span>Мої послуги</span>
+                        <select id="masterServices" multiple size="8"></select>
+                    </label>
+                    <button type="submit" class="btn-premium btn-block">Зберегти зміни</button>
+                </form>
+            </section>
+
+            <section class="admin-section master-bookings-panel">
+                <div class="admin-section__head">
+                    <h3>Мої записи</h3>
+                    <label class="master-filter">
+                        <span>Фільтр</span>
+                        <select id="masterBookingFilter">
+                            <option value="all">Усі записи</option>
+                            <option value="pending">В очікуванні</option>
+                            <option value="confirmed">Підтверджені</option>
+                            <option value="completed">Виконані</option>
+                            <option value="canceled">Скасовані</option>
+                        </select>
+                    </label>
+                </div>
+                <div id="masterBookingsList" class="master-bookings-list">
+                    <p class="loading-text">Завантаження записів...</p>
+                </div>
+            </section>
+        </div>
+
+        <section class="admin-section master-reviews-panel">
+            <div class="admin-section__head">
+                <h3>Мої відгуки</h3>
+                <span class="badge status-pending">Усі</span>
+            </div>
+            <div id="masterReviewsList" class="master-reviews-list">
+                <p class="loading-text">Завантаження відгуків...</p>
+            </div>
+        </section>
+    </main>
 
     <script src="../js/api.js"></script>
-    <script src="../js/auth.js"></script>
     <script src="../js/master.js"></script>
-    <script>
-        if (localStorage.getItem("role") !== "master") {
-            alert("Доступ заборонено. Тільки для майстрів.");
-            window.location.href = "../index.html";
-        }
-    </script>
 </body>
 </html>

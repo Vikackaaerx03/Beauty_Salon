@@ -2,44 +2,77 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Мій Профіль | Beauty Salon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мій профіль | Beauty Salon</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body class="bg-main">
     <header class="navbar">
         <a href="../index.html" class="logo">Beauty Salon</a>
         <nav class="nav-links">
-             <a href="../index.html">Головна</a>
-        </nav> 
+            <a href="../index.html">Головна</a>
+        </nav>
     </header>
 
-    <div class="container profile-container">
-        <h1>Особистий кабінет клієнта</h1>
-        
-        <div class="profile-grid">
-            <div class="profile-card">
-                <h3>Мої дані</h3>
-                <form id="editProfileForm">
-                    <div class="form-group">
-                        <label>Ім'я:</label>
-                        <input type="text" id="editName" class="input-field">
-                    </div>
-                    <div class="form-group">
-                        <label>Email:</label>
-                        <input type="email" id="editEmail" class="input-field">
-                    </div>
-                    <button type="submit" class="btn-premium">ЗБЕРЕГТИ ЗМІНИ</button>
-                </form>
-            </div>
+    <main class="container profile-container">
+        <div class="profile-intro">
+            <p class="home-eyebrow">Особистий простір</p>
+            <h1>Особистий кабінет клієнта</h1>
+            <p class="profile-lead">
+                Тут можна оновити свої дані, переглянути записи та відслідковувати листи з відгуками.
+            </p>
+        </div>
 
-            <div class="history-card">
-                <h3>Історія моїх записів</h3>
-                <div id="userBookingsList">
+        <div class="admin-grid profile-grid">
+            <section class="admin-section profile-section">
+                <div class="admin-section__head">
+                    <div>
+                        <p class="section-caption">Профіль</p>
+                        <h3>Мої дані</h3>
+                    </div>
+                </div>
+
+                <form id="editProfileForm" class="auth-form profile-form">
+                    <div class="profile-avatar-row">
+                        <img id="profileAvatarPreview" class="profile-avatar" src="" alt="Аватар клієнта">
+                        <label class="master-file-input">
+                            <span>Нова аватарка</span>
+                            <input type="file" id="profileAvatarFile" accept="image/*">
+                        </label>
+                    </div>
+                    <input type="text" id="editName" placeholder="Ім'я та прізвище" required>
+                    <input type="email" id="editEmail" placeholder="E-mail" required>
+                    <button type="submit" class="btn-premium btn-block">Зберегти зміни</button>
+                </form>
+            </section>
+
+            <section class="admin-section profile-section profile-section--wide">
+                <div class="admin-section__head">
+                    <div>
+                        <p class="section-caption">Історія</p>
+                        <h3>Мої записи</h3>
+                    </div>
+                </div>
+
+                <div id="userBookingsList" class="profile-list">
                     <p class="loading-text">Завантаження записів...</p>
                 </div>
-            </div>
+            </section>
+
+            <section class="admin-section profile-section profile-section--wide">
+                <div class="admin-section__head">
+                    <div>
+                        <p class="section-caption">Сповіщення</p>
+                        <h3>Пошта та відгуки</h3>
+                    </div>
+                </div>
+
+                <div id="mailNotifications" class="profile-list">
+                    <p class="loading-text">Перевірка повідомлень...</p>
+                </div>
+            </section>
         </div>
-    </div>
+    </main>
 
     <script src="../js/api.js"></script>
     <script src="../js/profile.js"></script>

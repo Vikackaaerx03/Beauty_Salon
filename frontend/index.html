@@ -1,42 +1,112 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Beauty Salon | Твоя Б'юті-Територія</title>
-    <link rel="stylesheet" href="css/style.css?">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beauty Salon | Твоя б'юті-територія</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-main">
     <header class="navbar">
         <a href="index.html" class="logo">Beauty Salon</a>
-        
-        <nav class="nav-links" style="flex-grow: 1; text-align: center;">
-            <a href="pages/masters.html">МАЙСТРИ</a>
-            <a href="pages/masters.html" id="masterLink" style="display: none;">МІЙ РОЗКЛАД</a>
-            <a href="pages/admin.html" id="adminLink" style="display: none;">АДМІН ПАНЕЛЬ</a>
+
+        <nav class="nav-links" id="navLinks">
+            <a href="pages/admin.html" id="adminLink" style="display:none;">АДМІН ПАНЕЛЬ</a>
         </nav>
 
         <div class="auth-buttons" id="guestButtons">
             <a href="pages/login.html" class="btn-outline">УВІЙТИ</a>
-            <a href="pages/register.html" class="btn-premium" style="text-decoration: none; padding: 11px 25px;">РЕЄСТРАЦІЯ</a>
+            <a href="pages/register.html" class="btn-premium">РЕЄСТРАЦІЯ</a>
         </div>
 
-        <div class="auth-buttons" id="userButtons" style="display: none;">
-            <a href="#" onclick="window.logout()" class="btn-outline">ВИЙТИ</a>
+        <div class="auth-buttons" id="userButtons" style="display:none;">
+            <a href="#" onclick="window.logout(); return false;" class="btn-outline">ВИЙТИ</a>
         </div>
     </header>
 
-    <div class="container" style="text-align: center; margin-top: 15vh; background: transparent; box-shadow: none;">
-        <h1 style="font-size: 48px; letter-spacing: 5px; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">СТАНЬ КРАЩОЮ ВЕРСІЄЮ СЕБЕ</h1>
-        <br>
-        <button id="heroBookingBtn" class="btn-premium">ЗАПИСАТИСЯ ОНЛАЙН</button>
-    </div>
+    <main class="home-shell">
+        <section class="home-panel home-panel--masters">
+            <p class="home-eyebrow">КОМАНДА</p>
 
-    <footer style="background: var(--primary-dark); color: white; padding: 40px 60px; margin-top: 20vh; text-align: center;">
-        <h3 style="font-family: 'Playfair Display', serif; margin-bottom: 10px;">Beauty Space</h3>
-        <p style="font-size: 12px; opacity: 0.7;">© 2026 Victoria Roslav</p>
+            <div class="home-controls">
+                <label>
+                    <span>Сортування</span>
+                    <select id="masterSortSelect">
+                        <option value="rating">За рейтингом</option>
+                        <option value="name">За ім'ям</option>
+                    </select>
+                </label>
+                <label>
+                    <span>Майстер</span>
+                    <select id="masterFilterSelect">
+                        <option value="">Усі майстри</option>
+                    </select>
+                </label>
+                <label>
+                    <span>Послуга</span>
+                    <select id="serviceFilterSelect">
+                        <option value="">Усі послуги</option>
+                    </select>
+                </label>
+            </div>
+
+            <div id="homeMastersGrid" class="home-master-grid"></div>
+        </section>
+
+        <section class="home-panel home-panel--booking">
+            <p class="home-eyebrow home-eyebrow--pill">ОНЛАЙН-ЗАПИС</p>
+
+            <div class="home-cta-row">
+                <button id="bookingCtaBtn" class="btn-premium" type="button">Запис на послугу</button>
+            </div>
+
+            <div class="home-feature-grid">
+                <article class="home-feature">
+                    <strong>Швидко</strong>
+                    <span>запис у кілька кліків</span>
+                </article>
+                <article class="home-feature">
+                    <strong>Точно</strong>
+                    <span>майстер під потрібну послугу</span>
+                </article>
+                <article class="home-feature">
+                    <strong>Зручно</strong>
+                    <span>без зайвих переходів і пошуку</span>
+                </article>
+            </div>
+
+            <div class="booking-steps">
+                <div class="booking-step">
+                    <div class="booking-step__num">01</div>
+                    <div>
+                        <h3>Вибери свого майстра</h3>
+                        <p>Оціни рейтинг, відгуки та послуги фахівця.</p>
+                    </div>
+                </div>
+                <div class="booking-step">
+                    <div class="booking-step__num">02</div>
+                    <div>
+                        <h3>Оберіть послугу та час</h3>
+                        <p>Швидко вибери потрібний сервіс і таймслот.</p>
+                    </div>
+                </div>
+                <div class="booking-step">
+                    <div class="booking-step__num">03</div>
+                    <div>
+                        <h3>Підтверди запис</h3>
+                        <p>Підтвердження займає лише кілька секунд.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <h3>Beauty Space</h3>
+        <p>© 2026 Victoria Roslav</p>
     </footer>
 
     <script src="js/api.js"></script>
-    <script src="js/index.js"></script> </body>
+    <script src="js/index.js"></script>
 </body>
 </html>

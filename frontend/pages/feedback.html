@@ -2,43 +2,51 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Залишити відгук</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body class="bg-main">
-    <div class="container" style="max-width: 500px; text-align: center;">
-        <h2>Оцініть свій візит</h2>
-        <p style="font-size: 14px; margin-bottom: 30px;">Ми прагнемо ставати кращими для вас.</p>
-        
-        <form id="feedbackForm">
-            <select id="rating" style="text-align: center; font-size: 18px;" required>
-                <option value="5">⭐⭐⭐⭐⭐ Відмінно</option>
-                <option value="4">⭐⭐⭐⭐ Добре</option>
-                <option value="3">⭐⭐⭐ Нормально</option>
-                <option value="2">⭐⭐ Погано</option>
-                <option value="1">⭐ Жахливо</option>
+    <main class="auth-card">
+        <a href="../index.html" class="back-link">&larr; На головну</a>
+        <p class="home-eyebrow">Відгук</p>
+        <h1 class="auth-title">Оціни візит</h1>
+        <p class="auth-note">Відгук можна залишити після завершеного та оплаченого запису.</p>
+
+        <form id="feedbackForm" class="auth-form">
+            <div id="availableBookings">
+                <label style="display:block; margin-bottom: 8px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; font-size:11px;">Оберіть завершений запис</label>
+                <select id="bookingSelect" required>
+                    <option value="">-- Оберіть запис --</option>
+                </select>
+            </div>
+
+            <div id="bookingInfo" class="home-feature" hidden>
+                <strong>Деталі запису</strong>
+                <div style="display:grid; gap:6px; margin-top:10px;">
+                    <span><b>Послуга:</b> <span id="serviceName"></span></span>
+                    <span><b>Майстер:</b> <span id="masterName"></span></span>
+                    <span><b>Дата:</b> <span id="bookingDate"></span></span>
+                    <span><b>Статус оплати:</b> <span id="paymentStatus"></span></span>
+                </div>
+            </div>
+
+            <select id="rating" required>
+                <option value="">Оберіть рейтинг</option>
+                <option value="5">★★★★★ Відмінно</option>
+                <option value="4">★★★★☆ Добре</option>
+                <option value="3">★★★☆☆ Нормально</option>
+                <option value="2">★★☆☆☆ Погано</option>
+                <option value="1">★☆☆☆☆ Жахливо</option>
             </select>
-            
-            <textarea id="comment" placeholder="Ваші враження (необов'язково)" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; font-family: inherit; margin-bottom: 20px;"></textarea>
-            
-            <button type="submit" class="btn-premium" style="width: 100%;">НАДІСЛАТИ ВІДГУК</button>
+
+            <textarea id="comment" placeholder="Ваш коментар майстру" style="min-height: 120px;"></textarea>
+
+            <button type="submit" class="btn-premium btn-block">Надіслати відгук</button>
         </form>
-    </div>
+    </main>
 
     <script src="../js/api.js"></script>
-    <script>
-        document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const data = {
-                rating: parseInt(document.getElementById('rating').value),
-                comment: document.getElementById('comment').value
-            };
-            try {
-                await request("/feedback", "POST", data); // Зміни роут під свій бекенд
-                alert("Дякуємо за ваш відгук!");
-                window.location.href = "../index.html";
-            } catch (error) {}
-        });
-    </script>
+    <script src="../js/feedback.js"></script>
 </body>
 </html>

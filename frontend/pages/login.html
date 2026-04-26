@@ -1,28 +1,31 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вхід | Beauty Salon</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body class="bg-auth">
-    <div class="container" style="max-width: 400px; margin-top: 10vh;">
-        <a href="../index.html" class="back-link">&larr; НА ГОЛОВНУ</a>
-        <h2>Авторизація</h2>
-        
-        <form id="loginForm">
+    <main class="auth-card auth-card--compact">
+        <a href="../index.html" class="back-link">&larr; На головну</a>
+        <p class="home-eyebrow">Авторизація</p>
+        <h1 class="auth-title">Увійди в свій акаунт</h1>
+        <p class="auth-note">Авторизуйся, щоб керувати записами, переглядати профіль і бронювати послуги.</p>
+
+        <form id="loginForm" class="auth-form">
             <input type="email" id="email" placeholder="E-MAIL" required>
             <input type="password" id="password" placeholder="ПАРОЛЬ" required>
-            
-            <div id="loginError" class="form-error" aria-live="polite" role="alert" style="display:none; color: #dc3545; font-size: 12px; margin-bottom: 15px; text-align: center;"></div>
-            
-            <button type="submit" class="btn-premium" style="width: 100%;">УВІЙТИ</button>
+
+            <div id="loginError" class="form-error" aria-live="polite" role="alert" hidden></div>
+
+            <button type="submit" class="btn-premium btn-block">УВІЙТИ</button>
         </form>
 
-        <p style="text-align: center; font-size: 12px; margin-top: 20px;">
-            Немає аккаунту? <a href="register.html" style="color: black; font-weight: bold;">ЗАРЕЄСТРУВАТИСЯ</a>
+        <p class="auth-note auth-note--center">
+            Немає акаунту? <a href="register.html">Зареєструватися</a>
         </p>
-    </div>
+    </main>
 
     <script src="../js/api.js"></script>
     <script src="../js/login.js"></script>

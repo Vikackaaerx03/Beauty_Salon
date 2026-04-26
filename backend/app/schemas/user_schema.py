@@ -5,7 +5,7 @@ import re
 from pydantic import BaseModel, Field, field_validator, ConfigDict
 
 EMAIL_PATTERN = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
-UserRole = Literal['guest', 'client', 'admin', 'master']
+UserRole = Literal['client', 'admin', 'master']
 
 def _ensure_valid_email(value: str | None) -> str | None:
     if value is None: return None
@@ -20,6 +20,7 @@ class UserBase(BaseModel):
     role: UserRole = 'client'
     rating: float = 0.0
     services_offered: list[str] = Field(default_factory=list)
+    avatar: str | None = None
     
     model_config = ConfigDict(populate_by_name=True)
 
@@ -39,6 +40,7 @@ class UserUpdate(BaseModel):
     role: UserRole | None = None
     rating: float | None = None
     services_offered: list[str] | None = None
+    avatar: str | None = None
 
     @field_validator('email', mode='before')
     def validate_update_email(cls, value: str | None) -> str | None:

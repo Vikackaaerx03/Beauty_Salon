@@ -2,33 +2,68 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Запис | Beauty Salon</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body class="bg-main">
     <header class="navbar">
         <a href="../index.html" class="logo">Beauty Salon</a>
-        <nav class="nav-links"><a href="#" onclick="localStorage.clear(); location.href='../index.html'">ВИЙТИ</a></nav>
+        <nav class="nav-links">
+            <a href="#" onclick="localStorage.clear(); location.href='../index.html'">Вийти</a>
+        </nav>
     </header>
 
-    <div class="container" style="max-width: 600px;">
-        <h2>Оформлення Запису</h2>
-        <form id="bookingForm">
-            <label style="font-size: 11px; letter-spacing: 1px; text-transform: uppercase;">Оберіть послугу:</label>
-            <select id="serviceSelect" required><option value="">Завантаження послуг...</option></select>
-            
-            <label style="font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-top: 15px; display: block;">Оберіть майстра:</label>
-            <select id="masterSelect" required><option value="">Завантаження майстрів...</option></select>
-            
-            <label style="font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-top: 15px; display: block;">Оберіть доступний час:</label>
-            <select id="timeslotSelect" required>
-                <option value="">Спочатку оберіть майстра...</option>
-            </select>
-            
-            <button type="submit" class="btn-premium" style="width: 100%; margin-top: 30px;">ПІДТВЕРДИТИ ЗАПИС</button>
-        </form>
-    </div>
-    
+    <main class="container booking-page">
+        <div class="booking-panel">
+            <div class="booking-panel__head">
+                <div>
+                    <p class="home-eyebrow">Оформлення запису</p>
+                    <h1 class="booking-title">Оберіть послугу, майстра і час</h1>
+                    <p class="booking-subtitle">
+                        Після вибору послуги список майстрів автоматично відфільтрується під неї,
+                        а рейтинг видно прямо в списку.
+                    </p>
+                </div>
+                <div class="booking-legend">
+                    <span class="booking-legend__item booking-legend__item--free">🟢 доступний слот</span>
+                    <span class="booking-legend__item booking-legend__item--busy">🔴 минулий або зайнятий слот</span>
+                </div>
+            </div>
+
+            <form id="bookingForm" class="booking-form">
+                <label>
+                    <span>Оберіть послугу</span>
+                    <select id="serviceSelect" required>
+                        <option value="">Завантаження послуг...</option>
+                    </select>
+                </label>
+
+                <p class="booking-help" id="bookingHelp">Після вибору послуги список майстрів автоматично відфільтрується.</p>
+
+                <label>
+                    <span>Оберіть майстра</span>
+                    <select id="masterSelect" required>
+                        <option value="">Завантаження майстрів...</option>
+                    </select>
+                </label>
+
+                <div id="masterPreview" class="master-preview">
+                    Оберіть майстра, щоб побачити рейтинг і послуги.
+                </div>
+
+                <label>
+                    <span>Оберіть доступний час</span>
+                    <select id="timeslotSelect" required>
+                        <option value="">Спочатку оберіть майстра</option>
+                    </select>
+                </label>
+
+                <button type="submit" class="btn-premium btn-block booking-submit">Підтвердити запис</button>
+            </form>
+        </div>
+    </main>
+
     <script src="../js/api.js"></script>
     <script src="../js/booking.js"></script>
     <script>

@@ -1,8 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Панель Адміністратора | Beauty Space</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель адміністратора | Beauty Space</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body class="bg-admin">
@@ -27,12 +28,30 @@
         </div>
     </div>
 
-    <div class="container" style="max-width: 1400px; background: transparent; box-shadow: none; margin-top: 20px;">
-        <h1 style="color: white; text-shadow: 2px 2px 8px rgba(0,0,0,0.5); letter-spacing: 4px; margin-bottom: 40px; text-align: center;">УПРАВЛІННЯ САЛОНОМ</h1>
+    <div class="container admin-container">
+        <h1 class="admin-title">УПРАВЛІННЯ САЛОНОМ</h1>
+        <div id="adminLoadStatus" class="admin-load-status" hidden></div>
+
+        <section class="admin-section admin-payment-panel">
+            <div class="admin-section__head">
+                <h3>ПРИЙНЯТТЯ ОПЛАТИ</h3>
+                <button class="btn-add-main" onclick="openAddModal('payments')">+</button>
+            </div>
+            <div class="admin-inline-action">
+                <label>
+                    <span>Платіж для прийняття</span>
+                    <select id="paymentAcceptSelect">
+                        <option value="">Оберіть платіж</option>
+                    </select>
+                </label>
+                <button type="button" class="btn-premium" id="acceptSelectedPaymentBtn">Прийняти</button>
+                <span class="loading-text">Оберіть платіж зверху, щоб швидко змінити його статус на оплачений.</span>
+            </div>
+        </section>
 
         <div class="admin-grid">
             <section class="admin-section">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <div class="admin-section__head">
                     <h3>БРОНЮВАННЯ</h3>
                     <button class="btn-add-main" onclick="openAddModal('bookings')">+</button>
                 </div>
@@ -40,7 +59,7 @@
             </section>
 
             <section class="admin-section">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <div class="admin-section__head">
                     <h3>ПЛАТЕЖІ</h3>
                     <button class="btn-add-main" onclick="openAddModal('payments')">+</button>
                 </div>
@@ -48,7 +67,7 @@
             </section>
 
             <section class="admin-section">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <div class="admin-section__head">
                     <h3>КОРИСТУВАЧІ</h3>
                     <button class="btn-add-main" onclick="openAddModal('users')">+</button>
                 </div>
@@ -56,7 +75,7 @@
             </section>
 
             <section class="admin-section">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <div class="admin-section__head">
                     <h3>ПОСЛУГИ</h3>
                     <button class="btn-add-main" onclick="openAddModal('services')">+</button>
                 </div>
@@ -64,7 +83,7 @@
             </section>
 
             <section class="admin-section">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <div class="admin-section__head">
                     <h3>РОЗКЛАД</h3>
                     <button class="btn-add-main" onclick="openAddModal('schedules')">+</button>
                 </div>
@@ -72,7 +91,7 @@
             </section>
 
             <section class="admin-section">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <div class="admin-section__head">
                     <h3>ВІДГУКИ</h3>
                     <button class="btn-add-main" onclick="openAddModal('feedback')">+</button>
                 </div>

@@ -1,49 +1,56 @@
-const registerForm = document.getElementById('registerForm');
-const nameInput = document.getElementById('name');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const errorBox = document.getElementById('registerError');
+const registerForm = document.getElementById("registerForm");
+const nameInput = document.getElementById("name");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const roleInput = document.getElementById("role");
+const errorBox = document.getElementById("registerError");
 
 function showRegisterError(message) {
     if (errorBox) {
         errorBox.textContent = message;
-        errorBox.style.display = 'block';
-    } else {
-        alert(message);
+        errorBox.hidden = false;
+        return;
     }
+
+    alert(message);
 }
 
 function hideRegisterError() {
-    if (errorBox) errorBox.style.display = 'none';
+    if (errorBox) {
+        errorBox.hidden = true;
+        errorBox.textContent = "";
+    }
 }
 
 if (registerForm) {
-    nameInput.addEventListener('input', hideRegisterError);
-    emailInput.addEventListener('input', hideRegisterError);
-    passwordInput.addEventListener('input', hideRegisterError);
+    [nameInput, emailInput, passwordInput, roleInput].forEach((input) => {
+        if (input) {
+            input.addEventListener("input", hideRegisterError);
+            input.addEventListener("change", hideRegisterError);
+        }
+    });
 
-    registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    registerForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
         hideRegisterError();
-        
+
         const name = nameInput.value.trim();
         const email = emailInput.value.trim();
         const password = passwordInput.value;
-        const role = document.getElementById('role').value;
+        const role = roleInput.value;
 
         if (!name || !email || !password) {
             showRegisterError("Усі поля є обов'язковими.");
             return;
         }
 
-        const nameParts = name.split(/\s+/); 
+        const nameParts = name.split(/\s+/).filter(Boolean);
         if (nameParts.length < 2) {
-            showRegisterError("Будь ласка, введіть своє ім'я та прізвище (мінімум два слова).");
+            showRegisterError("Будь ласка, введіть ім'я та прізвище.");
             return;
         }
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             showRegisterError("Будь ласка, введіть коректний email.");
             return;
         }
@@ -53,24 +60,17 @@ if (registerForm) {
             return;
         }
 
-        const data = { name, email, password, role };
+        if (!["client", "master"].includes(role)) {
+            showRegisterError("Реєстрація доступна тільки для клієнта або майстра.");
+            return;
+        }
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/auth/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
-            });
-            const resData = await response.json();
-
-            if (response.ok) {
-                alert("Реєстрація успішна! Тепер увійдіть у свій акаунт.");
-                window.location.href = "login.html";
-            } else {
-                showRegisterError(resData.detail || "Такий email вже існує.");
-            }
+            await request("/auth/register", "POST", { name, email, password, role });
+            alert("Реєстрація успішна! Тепер увійдіть у свій акаунт.");
+            window.location.href = "login.html";
         } catch (error) {
-            showRegisterError("Помилка з'єднання з сервером.");
+            showRegisterError(error.message || "Помилка з'єднання з сервером.");
         }
     });
 }

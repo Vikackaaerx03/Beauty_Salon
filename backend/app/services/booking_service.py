@@ -17,9 +17,12 @@ class BookingService:
         timeslot = self.schedules.get_by_id(payload.timeslot_id)
         if timeslot is None:
             raise ValueError("Timeslot not found")
-        if timeslot.get("master_id") != payload.master_id:
+        if str(timeslot.get("master_id")) != str(payload.master_id):
             raise ValueError("Timeslot does not belong to this master")
-        if timeslot.get("status") != "free":
+        if timeslot.get("status") != "free" or timeslot.get("booking_id") not in (None, "", "null"):
+            raise ValueError("Timeslot is not free")
+        existing_booking = self.bookings.get_by_timeslot_id(payload.timeslot_id)
+        if existing_booking is not None:
             raise ValueError("Timeslot is not free")
 
         booking_id = self.bookings.create(payload)
@@ -54,7 +57,7 @@ class BookingService:
             timeslot = self.schedules.get_by_id(new_timeslot_id)
             if timeslot is None:
                 raise ValueError("New timeslot not found")
-            if timeslot.get("master_id") != current["master_id"]:
+            if str(timeslot.get("master_id")) != str(current["master_id"]):
                 raise ValueError("New timeslot does not belong to this master")
             booked = self.schedules.mark_booked(new_timeslot_id, booking_id)
             if booked == 0:
