@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
+﻿@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
 
 :root {
     --bg-dark: #2c2628;
@@ -670,6 +670,7 @@ textarea:focus {
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .status-pending {
@@ -683,6 +684,11 @@ textarea:focus {
 }
 
 .status-canceled {
+    background: #fde2e6;
+    color: #9f1239;
+}
+
+.status-expired {
     background: #fde2e6;
     color: #9f1239;
 }
@@ -828,7 +834,20 @@ textarea:focus {
 
 .master-booking-card .master-info,
 .master-booking-card .booking-details {
+    display: grid;
+    gap: 4px;
     font-size: 13px;
+}
+
+.master-booking-card .booking-details span,
+.master-booking-card .master-info span {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.master-booking-card__avatar {
+    object-fit: cover;
+    object-position: center;
 }
 
 .master-review-card {
@@ -1548,3 +1567,4 @@ textarea:focus {
 .profile-list .master-info {
     color: var(--text-soft);
 }
+

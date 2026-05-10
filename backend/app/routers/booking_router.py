@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.security import get_current_admin, get_current_master_or_admin, get_current_user, logger
-from app.db.database import get_bookings_collection, get_schedules_collection
+from app.db.database import get_bookings_collection, get_schedules_collection, get_services_collection, get_users_collection
 from app.repositories.booking_repository import BookingRepository
 from app.repositories.schedules_repository import ScheduleRepository
+from app.repositories.services_repository import ServiceRepository
+from app.repositories.user_repository import UserRepository
 from app.schemas.booking_schema import BookingCreate, BookingDB, BookingUpdate
 from app.services.booking_service import BookingService
 
@@ -13,8 +15,15 @@ router = APIRouter(prefix="/bookings", tags=["Bookings"])
 def get_booking_service(
     bookings_collection=Depends(get_bookings_collection),
     schedules_collection=Depends(get_schedules_collection),
+    users_collection=Depends(get_users_collection),
+    services_collection=Depends(get_services_collection),
 ) -> BookingService:
-    return BookingService(BookingRepository(bookings_collection), ScheduleRepository(schedules_collection))
+    return BookingService(
+        BookingRepository(bookings_collection),
+        ScheduleRepository(schedules_collection),
+        UserRepository(users_collection),
+        ServiceRepository(services_collection),
+    )
 
 
 def _raise_from_value_error(exc: ValueError) -> None:

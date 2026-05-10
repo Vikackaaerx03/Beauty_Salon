@@ -50,6 +50,7 @@
             pending: '<span class="badge status-pending">Очікує</span>',
             confirmed: '<span class="badge status-confirmed">Підтверджено</span>',
             completed: '<span class="badge status-completed">Виконано</span>',
+            expired: '<span class="badge status-expired">Прострочено</span>',
             canceled: '<span class="badge status-canceled">Скасовано</span>',
             free: '<span class="badge status-confirmed">Вільно</span>',
             booked: '<span class="badge status-pending">Зайнято</span>',
@@ -66,6 +67,33 @@
     const isPendingPayment = (payment) => !["paid", "refunded"].includes(String(payment?.status || ""));
 
     const getNameById = (items, id) => items.find((item) => String(item.id) === String(id))?.name || `#${id}`;
+    const formatDate = (value) => {
+        if (!value) return "—";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return String(value);
+        return date.toLocaleString("uk-UA", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    };
+
+    const displayBookingStatus = (booking) => {
+        return window.getBookingDisplayStatus ? window.getBookingDisplayStatus(booking) : String(booking?.status || "pending").trim().toLowerCase();
+    };
+
+    const getBookingById = (id) => state.bookings.find((booking) => String(booking.id) === String(id));
+
+    const bookingSummary = (booking) => {
+        if (!booking) return "—";
+        const clientName = booking.client_name || getNameById(state.users, booking.client_id);
+        const serviceName = booking.service_name || getNameById(state.services, booking.service_id);
+        const masterName = booking.master_name || getNameById(state.users, booking.master_id);
+        const timeLabel = booking.timeslot_start ? formatDate(booking.timeslot_start) : (booking.timeslot_id ? `#${booking.timeslot_id}` : "—");
+        return `${clientName} · ${serviceName} · ${masterName} · ${timeLabel}`;
+    };
 
     const getBookingServiceOptions = (masterId, currentValue) => {
         const allowedServiceIds = masterId
@@ -88,7 +116,8 @@
             .map((slot) => {
                 const start = String(slot.start || "—").replace("T", " ").replace("Z", "");
                 const end = String(slot.end || "—").replace("T", " ").replace("Z", "");
-                const label = `#${slot.id} · ${start} - ${end} · ${slot.status || "—"}`;
+                const masterName = getNameById(state.users, slot.master_id);
+                const label = `${masterName} · ${start} - ${end} · ${slot.status || "—"}`;
                 return `<option value="${slot.id}" ${String(currentValue) === String(slot.id) ? "selected" : ""}>${esc(label)}</option>`;
             })
             .join("");
@@ -193,11 +222,11 @@
                 return `
                     <tr>
                         <td>${esc(item.id)}</td>
-                        <td>${esc(getNameById(state.users, item.client_id))}</td>
-                        <td>${esc(getNameById(state.services, item.service_id))}</td>
-                        <td>${esc(getNameById(state.users, item.master_id))}</td>
-                        <td>${esc(item.timeslot_id || "—")}</td>
-                        <td>${statusLabel(item.status)}</td>
+                        <td>${esc(item.client_name || getNameById(state.users, item.client_id))}</td>
+                        <td>${esc(item.service_name || getNameById(state.services, item.service_id))}</td>
+                        <td>${esc(item.master_name || getNameById(state.users, item.master_id))}</td>
+                        <td>${esc(window.getBookingTimeLabel ? window.getBookingTimeLabel(item) : (item.timeslot_start ? formatDate(item.timeslot_start) : (item.timeslot_id || "—")))}</td>
+                        <td>${statusLabel(displayBookingStatus(item))}</td>
                         <td class="admin-actions-cell">
                             ${actionButton("Редагувати", "edit", entity, item.id, "btn-row btn-row-edit")}
                             ${actionButton("Видалити", "delete", entity, item.id, "btn-row btn-row-delete")}
@@ -210,7 +239,7 @@
                 return `
                     <tr>
                         <td>${esc(item.id)}</td>
-                        <td>${esc(item.booking_id)}</td>
+                        <td>${esc(bookingSummary(getBookingById(item.booking_id)))}</td>
                         <td>${esc(item.amount)} грн</td>
                         <td>${esc(item.method || "—")}</td>
                         <td>${statusLabel(item.status)}</td>
@@ -270,9 +299,9 @@
                 return `
                     <tr>
                         <td>${esc(item.id)}</td>
-                        <td>${esc(getNameById(state.users, item.master_id))}</td>
-                        <td>${esc(item.start || "—")}</td>
-                        <td>${statusLabel(item.status)}</td>
+                        <td>${esc(item.master_name || getNameById(state.users, item.master_id))}</td>
+                        <td>${esc(item.start ? formatDate(item.start) : "—")}</td>
+                        <td>${statusLabel(displayBookingStatus(item))}</td>
                         <td class="admin-actions-cell">
                             ${actionButton("Редагувати", "edit", entity, item.id, "btn-row btn-row-edit")}
                             ${actionButton("Видалити", "delete", entity, item.id, "btn-row btn-row-delete")}
@@ -348,7 +377,7 @@
         }
         if (entity === "payments" && field === "booking_id") {
             return state.bookings
-                .map((b) => `<option value="${b.id}" ${String(currentValue) === String(b.id) ? "selected" : ""}>Booking #${b.id}</option>`).join("");
+                .map((b) => `<option value="${b.id}" ${String(currentValue) === String(b.id) ? "selected" : ""}>${esc(bookingSummary(b))}</option>`).join("");
         }
         if (entity === "users" && field === "role") {
             return ["client", "master"]
@@ -380,7 +409,7 @@
         }
         if (entity === "feedback" && field === "booking_id") {
             return state.bookings
-                .map((b) => `<option value="${b.id}" ${String(currentValue) === String(b.id) ? "selected" : ""}>Booking #${b.id}</option>`).join("");
+                .map((b) => `<option value="${b.id}" ${String(currentValue) === String(b.id) ? "selected" : ""}>${esc(bookingSummary(b))}</option>`).join("");
         }
         if (entity === "feedback" && field === "client_id") {
             return state.users.filter((u) => u.role === "client")
@@ -494,7 +523,7 @@
 
         const pendingPayments = state.payments.filter(isPendingPayment);
         paymentAcceptSelect.innerHTML = '<option value="">Оберіть платіж</option>' + pendingPayments
-            .map((payment) => `<option value="${payment.id}">#${payment.id} · Booking #${payment.booking_id} · ${payment.amount} грн · ${payment.method || "—"} · ${payment.status || "—"}</option>`)
+            .map((payment) => `<option value="${payment.id}">#${payment.id} · ${esc(bookingSummary(getBookingById(payment.booking_id)))} · ${payment.amount} грн · ${payment.method || "—"} · ${payment.status || "—"}</option>` )
             .join("");
     };
 
@@ -611,3 +640,7 @@
 
     await loadAll();
 });
+
+
+
+

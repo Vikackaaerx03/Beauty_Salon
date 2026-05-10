@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,10 +18,24 @@ from app.routers.user_router import router as user_router
 
 logger = logging.getLogger(__name__)
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    try:
+        init_db()
+    except Exception:
+        logger.warning("MongoDB недоступна під час старту застосунку. API продовжить роботу без ініціалізації індексів.")
+    yield
+    # Shutdown
+    close_client()
+
+
 app = FastAPI(
     title="Beauty Salon API",
     description="REST API для управління салоном краси",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -38,19 +53,6 @@ app.include_router(schedules_router)
 app.include_router(booking_router)
 app.include_router(payments_router)
 app.include_router(feedback_router)
-
-
-@app.on_event("startup")
-def _startup() -> None:
-    try:
-        init_db()
-    except Exception:
-        logger.warning("MongoDB недоступна під час старту застосунку. API продовжить роботу без ініціалізації індексів.")
-
-
-@app.on_event("shutdown")
-def _shutdown() -> None:
-    close_client()
 
 
 @app.get("/", tags=["Health"])

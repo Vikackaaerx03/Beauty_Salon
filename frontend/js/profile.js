@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", async () => {
+﻿document.addEventListener("DOMContentLoaded", async () => {
     const userStr = localStorage.getItem("user");
     const token = localStorage.getItem("access_token");
 
@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const mailNotifications = document.getElementById("mailNotifications");
     const profileAvatarPreview = document.getElementById("profileAvatarPreview");
     const profileAvatarFile = document.getElementById("profileAvatarFile");
+    let services = [];
 
     if (nameInput) nameInput.value = user.name || "";
     if (emailInput) emailInput.value = user.email || "";
@@ -174,12 +175,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     };
 
+    const serviceNameById = (serviceId) => services.find((service) => String(service.id) === String(serviceId))?.name || "Послуга";
+
+    const displayBookingStatus = (booking) => {
+        return window.getBookingDisplayStatus ? window.getBookingDisplayStatus(booking) : String(booking?.status || "pending").trim().toLowerCase();
+    };
     const statusLabel = (status) => {
-        const value = String(status || "pending").toLowerCase();
-        if (value === "completed") return "Виконано";
-        if (value === "confirmed") return "Підтверджено";
-        if (value === "canceled") return "Скасовано";
-        return "В очікуванні";
+        return window.getBookingStatusLabel ? window.getBookingStatusLabel(status) : "В очікуванні";
     };
 
     const loadHistory = async () => {
@@ -194,24 +196,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             bookingsList.innerHTML = bookings.map((booking) => {
-                const statusClass = booking.status === "completed"
-                    ? "status-completed"
-                    : booking.status === "confirmed"
-                        ? "status-confirmed"
-                        : booking.status === "canceled"
-                            ? "status-canceled"
-                            : "status-pending";
+                const displayStatus = displayBookingStatus(booking);
+                const statusClass = window.getBookingStatusClass ? window.getBookingStatusClass(displayStatus) : "status-pending";
 
                 return `
                     <article class="booking-history-item">
                         <div class="booking-header">
-                            <span class="service-name">${escapeHtml(booking.service_name || "Послуга")}</span>
-                            <span class="badge ${statusClass}">${statusLabel(booking.status)}</span>
+                            <span class="service-name">${escapeHtml(booking.service_name || serviceNameById(booking.service_id))}</span>
+                            <span class="badge ${statusClass}">${statusLabel(displayStatus)}</span>
                         </div>
                         <div class="booking-details">
-                            <span>Дата: ${escapeHtml(formatDate(booking.created_at))}</span>
+                            <span>Час: ${escapeHtml(window.getBookingTimeLabel ? window.getBookingTimeLabel(booking) : formatDate(booking.created_at))}</span>
                         </div>
-                        <div class="master-info">Майстер: ${escapeHtml(booking.master_name || booking.master_id)}</div>
+                        <div class="master-info">Майстер: ${escapeHtml(booking.master_name || `Майстер #${booking.master_id || "—"}`)}</div>
                     </article>
                 `;
             }).join("");
@@ -284,6 +281,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         updateAvatarPreview();
     }
 
+    try {
+        services = await request("/services");
+    } catch (error) {
+        services = [];
+    }
+
     await loadHistory();
     await loadMailBox();
 });
+
+
+
+
+
+
+

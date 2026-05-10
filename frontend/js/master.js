@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", async () => {
+﻿document.addEventListener("DOMContentLoaded", async () => {
     const userStr = localStorage.getItem("user");
     const token = localStorage.getItem("access_token");
 
@@ -36,9 +36,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const ratingSummary = document.getElementById("masterRatingSummary");
 
     const avatarMap = new Map([
-        ["Олена Гринюк", "../assets/images/icon_1.jpg"],
-        ["Марія Коваль", "../assets/images/icon_2.jpg"],
-        ["Анна Мельник", "../assets/images/icon_3.jpg"],
+        ["Марія Коваль", "../assets/images/icon_1.jpg"],
+        ["Анна Мельник", "../assets/images/icon_2.jpg"],
+        ["Олена Ринчук", "../assets/images/icon_3.jpg"],
         ["Іван Шевченко", "../assets/images/icon_4.jpg"],
         ["Дмитро Савчук", "../assets/images/icon_5.jpg"],
     ]);
@@ -108,20 +108,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         return `${String.fromCodePoint(9733).repeat(Math.floor(value))}${String.fromCodePoint(9734).repeat(5 - Math.floor(value))}`;
     };
 
+    const formatDate = (value) => {
+        if (!value) return "—";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return String(value);
+        return date.toLocaleString("uk-UA", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    };
+
+    const displayBookingStatus = (booking) => {
+        return window.getBookingDisplayStatus ? window.getBookingDisplayStatus(booking) : String(booking?.status || "pending").trim().toLowerCase();
+    };
     const statusLabel = (status) => {
-        const value = String(status || "pending").toLowerCase();
-        if (value === "completed") return "Виконано";
-        if (value === "canceled") return "Скасовано";
-        if (value === "confirmed") return "Підтверджено";
-        return "В очікуванні";
+        return window.getBookingStatusLabel ? window.getBookingStatusLabel(status) : "В очікуванні";
     };
 
     const statusClass = (status) => {
-        const value = String(status || "pending").toLowerCase();
-        if (value === "completed") return "status-completed";
-        if (value === "canceled") return "status-canceled";
-        if (value === "confirmed") return "status-confirmed";
-        return "status-pending";
+        return window.getBookingStatusClass ? window.getBookingStatusClass(status) : "status-pending";
     };
 
     const paymentLabel = (status) => {
@@ -171,7 +179,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!bookingsList) return;
 
         const filterValue = String(bookingsFilter?.value || "all");
-        const visibleBookings = bookingsCache.filter((booking) => filterValue === "all" || String(booking.status || "pending") === filterValue);
+        const visibleBookings = bookingsCache.filter((booking) => filterValue === "all" || displayBookingStatus(booking) === filterValue);
 
         if (!visibleBookings.length) {
             bookingsList.innerHTML = "<p class='no-data'>Записів за цим фільтром немає.</p>";
@@ -179,35 +187,46 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         bookingsList.innerHTML = visibleBookings.map((booking) => {
-            const serviceName = serviceChoices.find((service) => String(service.id) === String(booking.service_id))?.name || `Послуга #${booking.service_id || "—"}`;
+            const displayStatus = displayBookingStatus(booking);
+            const serviceName = booking.service_name || serviceChoices.find((service) => String(service.id) === String(booking.service_id))?.name || `Послуга #${booking.service_id || "—"}`;
+            const clientName = booking.client_name || `Ім'я клієнта #${booking.client_id || "—"}`;
+            const slotLabel = window.getBookingTimeLabel ? window.getBookingTimeLabel(booking) : (booking.timeslot_start ? `${formatDate(booking.timeslot_start)}${booking.timeslot_end ? ` - ${formatDate(booking.timeslot_end)}` : ""}` : `#${booking.timeslot_id || "—"}`);
             const payment = booking.payment || null;
+            const paymentMethod = String(payment?.method || "").trim().toLowerCase();
+            const paymentStatus = String(payment?.status || "").trim().toLowerCase();
+            const canManageBooking = displayStatus !== "expired";
+            const canAcceptCashPayment = displayStatus === "completed" && (paymentMethod === "cash" || !payment) && paymentStatus !== "paid";
+            const paymentBadgeLabel = payment ? paymentLabel(payment?.status) : "Не оплачено";
+            const paymentBadgeClass = payment ? paymentClass(payment?.status) : "status-pending";
 
             return `
                 <article class="booking-history-item master-booking-card">
                     <div class="master-booking-card__head">
-                        <img class="master-booking-card__avatar" src="${escapeHtml(makeInitialsAvatar(booking.client_name || `Клієнт #${booking.client_id || "—"}`))}" alt="${escapeHtml(booking.client_name || `Клієнт #${booking.client_id || "—"}`)}">
+                        <img class="master-booking-card__avatar" src="${escapeHtml(makeInitialsAvatar(clientName))}" alt="${escapeHtml(clientName)}">
                         <div class="booking-header">
                             <span class="service-name">${escapeHtml(serviceName)}</span>
-                            <span class="badge ${statusClass(booking.status)}">${statusLabel(booking.status)}</span>
+                            <span class="badge ${statusClass(displayStatus)}">${statusLabel(displayStatus)}</span>
                         </div>
                     </div>
                     <div class="booking-details">
-                        <span>Клієнт: <strong>#${escapeHtml(booking.client_id || "—")}</strong></span>
-                        <span>Слот: ${escapeHtml(booking.timeslot_id || "—")}</span>
+                        <span>Клієнт: <strong>${escapeHtml(clientName)}</strong></span>
+                        <span>Слот: ${escapeHtml(slotLabel)}</span>
                     </div>
                     <div class="master-info">
-                        Оплата: <span class="badge ${paymentClass(payment?.status)}">${paymentLabel(payment?.status)}</span>
+                        Оплата: <span class="badge ${paymentBadgeClass}">${paymentBadgeLabel}</span>
                     </div>
-                    <div class="master-actions">
-                        <button class="btn-row btn-row-edit" type="button" data-booking-status="completed" data-booking-id="${escapeHtml(booking.id)}">Виконано</button>
-                        <button class="btn-row btn-row-delete" type="button" data-booking-status="pending" data-booking-id="${escapeHtml(booking.id)}">Не виконано</button>
-                        <button class="btn-row btn-row-edit" type="button" data-booking-status="canceled" data-booking-id="${escapeHtml(booking.id)}">Скасувати</button>
-                        ${payment ? `
-                            <button class="btn-row btn-row-edit" type="button" data-payment-status="${payment.status === "paid" ? "unpaid" : "paid"}" data-payment-id="${escapeHtml(payment.id)}">
-                                ${payment.status === "paid" ? "Не оплачено" : "Оплачено"}
-                            </button>
-                        ` : ""}
-                    </div>
+                    ${canManageBooking ? `
+                        <div class="master-actions">
+                            <button class="btn-row btn-row-edit" type="button" data-booking-status="completed" data-booking-id="${escapeHtml(booking.id)}">Виконано</button>
+                            <button class="btn-row btn-row-delete" type="button" data-booking-status="pending" data-booking-id="${escapeHtml(booking.id)}">Не виконано</button>
+                            <button class="btn-row btn-row-edit" type="button" data-booking-status="canceled" data-booking-id="${escapeHtml(booking.id)}">Скасувати</button>
+                            ${canAcceptCashPayment ? `
+                                <button class="btn-row btn-row-edit" type="button" data-payment-status="paid" data-booking-id="${escapeHtml(booking.id)}">
+                                    Прийняти оплату
+                                </button>
+                            ` : ""}
+                        </div>
+                    ` : ""}
                 </article>
             `;
         }).join("");
@@ -229,15 +248,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         bookingsList.querySelectorAll("[data-payment-status]").forEach((button) => {
             button.addEventListener("click", async () => {
-                const paymentId = button.getAttribute("data-payment-id");
+                const bookingId = button.getAttribute("data-booking-id");
                 const status = button.getAttribute("data-payment-status");
-                if (!paymentId || !status) return;
-                if (!confirm(`Змінити статус оплати на "${paymentLabel(status)}"?`)) return;
+                if (!bookingId || !status) return;
+                if (!confirm(`Прийняти оплату для цього запису?`)) return;
                 try {
-                    await request(`/payments/${paymentId}`, "PATCH", { status });
+                    await request(`/payments/booking/${bookingId}/accept-cash`, "POST");
                     await loadBookings();
                 } catch (error) {
-                    alert(error.message || "Не вдалося оновити оплату.");
+                    alert(error.message || "Не вдалося прийняти оплату.");
                 }
             });
         });
@@ -251,18 +270,24 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        reviewsList.innerHTML = feedbackCache.map((item) => `
+        reviewsList.innerHTML = feedbackCache.map((item) => {
+            const clientLabel = item.client_name
+                ? `${item.client_name} #${item.client_id || "—"}`
+                : `Клієнт #${item.client_id || "—"}`;
+
+            return `
             <article class="master-review-card">
                 <div class="master-review-card__top">
                     <span class="badge status-confirmed">${avatarStarsSafe(item.rating)} ${Number(item.rating || 0)}</span>
                     <span class="badge">${escapeHtml(item.created_at ? new Date(item.created_at).toLocaleDateString("uk-UA") : "—")}</span>
                 </div>
                 <div class="master-review-card__meta">
-                    <div>Клієнт: <strong>#${escapeHtml(item.client_id || "—")}</strong></div>
+                    <div>Клієнт: <strong>${escapeHtml(clientLabel)}</strong></div>
                     <div>Коментар: ${escapeHtml(item.comment || "Без коментаря")}</div>
                 </div>
             </article>
-        `).join("");
+        `;
+        }).join("");
     };
 
     const loadServices = async () => {
@@ -367,6 +392,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             selectedAvatarFile = null;
             if (avatarFileInput) avatarFileInput.value = "";
             syncProfileForm();
+            if (dashboardTitle) {
+                dashboardTitle.textContent = `Кабінет майстра: ${user.name || "Майстер"}`;
+            }
             renderServicesBadge();
             renderRatingSummary();
             alert("Профіль майстра оновлено.");
@@ -379,3 +407,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadServices();
     await loadBookings();
 });
+
+
+
+
+
+

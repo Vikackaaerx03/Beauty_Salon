@@ -17,4 +17,6 @@ class FeedbackCreate(FeedbackBase):
     pass
 
 class FeedbackDB(FeedbackBase):
-    id: str 
+    id: str
+    client_name: str | None = None
+    master_name: str | None = None

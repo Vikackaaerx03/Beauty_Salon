@@ -1,18 +1,22 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.security import get_current_admin, get_current_user, logger
-from app.db.database import get_bookings_collection, get_feedback_collection, get_payments_collection
+from app.db.database import get_bookings_collection, get_feedback_collection, get_payments_collection, get_users_collection
 from app.repositories.booking_repository import BookingRepository
 from app.repositories.feedback_repository import FeedbackRepository
 from app.repositories.payments_repository import PaymentRepository
+from app.repositories.user_repository import UserRepository
 from app.schemas.feedback_schema import FeedbackCreate, FeedbackDB
 from app.services.feedback_service import FeedbackService
 
 router = APIRouter(prefix="/feedback", tags=["Feedback"])
 
 
-def get_feedback_service(collection=Depends(get_feedback_collection)) -> FeedbackService:
-    return FeedbackService(FeedbackRepository(collection))
+def get_feedback_service(
+    collection=Depends(get_feedback_collection),
+    users_collection=Depends(get_users_collection),
+) -> FeedbackService:
+    return FeedbackService(FeedbackRepository(collection), UserRepository(users_collection))
 
 
 @router.post("", response_model=FeedbackDB, status_code=status.HTTP_201_CREATED)

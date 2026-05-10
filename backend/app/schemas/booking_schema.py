@@ -23,3 +23,9 @@ class BookingDB(BookingBase):
     id: str
     created_at: datetime
     updated_at: datetime
+    client_name: str | None = None
+    master_name: str | None = None
+    service_name: str | None = None
+    timeslot_start: datetime | None = None
+    timeslot_end: datetime | None = None
+    timeslot_status: str | None = None
