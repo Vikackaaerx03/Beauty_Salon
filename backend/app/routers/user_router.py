@@ -2,7 +2,11 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
 from app.core.security import get_current_admin, get_current_user, logger
-from app.db.database import get_users_collection
+from app.db.database import get_bookings_collection, get_feedback_collection, get_payments_collection, get_schedules_collection, get_users_collection
+from app.repositories.booking_repository import BookingRepository
+from app.repositories.feedback_repository import FeedbackRepository
+from app.repositories.payments_repository import PaymentRepository
+from app.repositories.schedules_repository import ScheduleRepository
 from app.repositories.user_repository import UserRepository
 from app.schemas.user_schema import UserCreate, UserDB, UserUpdate
 from app.services.user_service import UserService
@@ -10,8 +14,20 @@ from app.services.user_service import UserService
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
-def get_user_service(collection=Depends(get_users_collection)) -> UserService:
-    return UserService(UserRepository(collection))
+def get_user_service(
+    collection=Depends(get_users_collection),
+    bookings_collection=Depends(get_bookings_collection),
+    payments_collection=Depends(get_payments_collection),
+    schedules_collection=Depends(get_schedules_collection),
+    feedback_collection=Depends(get_feedback_collection),
+) -> UserService:
+    return UserService(
+        UserRepository(collection),
+        BookingRepository(bookings_collection),
+        PaymentRepository(payments_collection),
+        ScheduleRepository(schedules_collection),
+        FeedbackRepository(feedback_collection),
+    )
 
 
 @router.get("/masters", response_model=list[UserDB])
@@ -41,7 +57,7 @@ def list_users(
     service: UserService = Depends(get_user_service),
     current_admin: dict = Depends(get_current_admin),
 ):
-    return service.get_all(role=role, service_id=service_id, sort_by=sort_by)
+    return service.get_all(role=role, service_id=service_id, sort_by=sort_by, include_deleted=True)
 
 
 @router.get("/{user_id}", response_model=UserDB)

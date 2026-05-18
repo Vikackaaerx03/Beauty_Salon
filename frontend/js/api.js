@@ -134,6 +134,8 @@ window.getBookingStatusLabel = function(status) {
     if (value === "confirmed") return "Підтверджено";
     if (value === "expired") return "Прострочено";
     if (value === "canceled") return "Скасовано";
+    if (value === "deleted") return "Видалено";
+    if (value === "archived") return "В архіві";
     return "В очікуванні";
 };
 
@@ -143,5 +145,7 @@ window.getBookingStatusClass = function(status) {
     if (value === "confirmed") return "status-confirmed";
     if (value === "expired") return "status-expired";
     if (value === "canceled") return "status-canceled";
+    if (value === "deleted") return "status-canceled";
+    if (value === "archived") return "status-confirmed";
     return "status-pending";
 };

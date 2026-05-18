@@ -54,8 +54,9 @@ def list_feedback(
     client_id: str | None = None,
     master_id: str | None = None,
     service: FeedbackService = Depends(get_feedback_service),
+    include_deleted: bool = False,
 ):
-    return service.list(client_id=client_id, master_id=master_id)
+    return service.list(client_id=client_id, master_id=master_id, include_deleted=include_deleted)
 
 
 @router.get("/{feedback_id}", response_model=FeedbackDB)

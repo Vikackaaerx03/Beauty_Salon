@@ -46,12 +46,21 @@ class BookingRepository:
         doc = self.collection.find_one({"timeslot_id": {"$in": [str(timeslot_id), to_mongo_id(timeslot_id)]}})
         return self._format(doc)
 
-    def get_all(self, client_id: str | None = None, master_id: str | None = None) -> list[dict]:
+    def count_active_by_service_id(self, service_id: str) -> int:
+        query = {
+            "service_id": {"$in": [str(service_id), to_mongo_id(service_id)]},
+            "status": {"$nin": ["canceled", "completed", "expired"]},
+        }
+        return self.collection.count_documents(query)
+
+    def get_all(self, client_id: str | None = None, master_id: str | None = None, include_deleted: bool = False) -> list[dict]:
         query: dict = {}
         if client_id:
             query["client_id"] = {"$in": [str(client_id), to_mongo_id(client_id)]}
         if master_id:
             query["master_id"] = {"$in": [str(master_id), to_mongo_id(master_id)]}
+        if not include_deleted:
+            query["status"] = {"$ne": "deleted"}
 
         docs = list(self.collection.find(query).sort("created_at", -1))
         return [self._format(doc) for doc in docs if self._format(doc) is not None]
@@ -67,5 +76,5 @@ class BookingRepository:
         return result.modified_count
 
     def delete(self, booking_id: str) -> int:
-        result = self.collection.delete_one(_id_query(booking_id))
-        return result.deleted_count
+        result = self.collection.update_one(_id_query(booking_id), {"$set": {"status": "deleted"}})
+        return result.modified_count

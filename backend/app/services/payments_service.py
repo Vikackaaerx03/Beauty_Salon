@@ -26,8 +26,8 @@ class PaymentsService:
             raise ValueError("Payment not found")
         return payment
 
-    def list(self, booking_id: str | None = None) -> list[dict]:
-        return self.repo.get_all(booking_id=booking_id)
+    def list(self, booking_id: str | None = None, include_deleted: bool = False) -> list[dict]:
+        return self.repo.get_all(booking_id=booking_id, include_deleted=include_deleted)
 
     def update(self, payment_id: str, payload: PaymentUpdate) -> dict:
         if payload.method == "card":

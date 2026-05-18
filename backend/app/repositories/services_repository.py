@@ -19,18 +19,21 @@ class ServiceRepository:
     def create(self, service: ServiceCreate) -> str:
         data = service.model_dump()
         data["id"] = str(self.collection.count_documents({}) + 1)
+        data.setdefault("status", "active")
         self.collection.insert_one(data)
         return data["id"]
 
     def get_by_id(self, service_id: str) -> dict | None:
         return self._format(self.collection.find_one(_id_query(service_id)))
 
-    def get_all(self, min_price: Optional[float] = None, max_price: Optional[float] = None) -> list[dict]:
+    def get_all(self, min_price: Optional[float] = None, max_price: Optional[float] = None, include_deleted: bool = False) -> list[dict]:
         query: dict = {}
         if min_price is not None:
             query["price"] = {"$gte": min_price}
         if max_price is not None:
             query.setdefault("price", {})["$lte"] = max_price
+        if not include_deleted:
+            query["status"] = {"$ne": "deleted"}
 
         docs = [self._format(doc) for doc in list(self.collection.find(query))]
         return sorted(
@@ -43,7 +46,8 @@ class ServiceRepository:
         return result.modified_count
 
     def delete(self, service_id: str) -> int:
-        return self.collection.delete_one(_id_query(service_id)).deleted_count
+        result = self.collection.update_one(_id_query(service_id), {"$set": {"status": "deleted"}})
+        return result.modified_count
 
     def _format(self, doc: dict | None) -> dict | None:
         if not doc:
@@ -51,4 +55,5 @@ class ServiceRepository:
         doc = dict(doc)
         doc["id"] = str(doc.get("id") or doc.get("_id"))
         doc.pop("_id", None)
+        doc.setdefault("status", "active")
         return doc

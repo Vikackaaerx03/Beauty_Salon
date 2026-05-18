@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Literal
 from pydantic import BaseModel
 
-TimeslotStatus = Literal["free", "booked"]
+TimeslotStatus = Literal["free", "booked", "deleted", "archived"]
 
 
 class TimeslotBase(BaseModel):

@@ -24,14 +24,18 @@ class AuthRepository:
         data["password_hash"] = hash_password(password)
         data.setdefault("rating", 0.0)
         data.setdefault("services_offered", [])
+        data.setdefault("status", "active")
         data["services_offered"] = [str(service_id) for service_id in data.get("services_offered", [])]
         data["created_at"] = datetime.utcnow()
 
         self.collection.insert_one(data)
         return data["id"]
 
-    def find_by_email(self, email: str) -> dict | None:
-        return self.collection.find_one({"email": email.strip()})
+    def find_by_email(self, email: str, include_deleted: bool = False) -> dict | None:
+        query: dict = {"email": email.strip()}
+        if not include_deleted:
+            query["status"] = {"$ne": "deleted"}
+        return self.collection.find_one(query)
 
     def get_public_by_id(self, user_id: str) -> dict | None:
         doc = self.collection.find_one(_id_query(user_id), {"password_hash": 0})
@@ -47,4 +51,5 @@ class AuthRepository:
         return doc
 
     def delete(self, user_id: str) -> int:
-        return self.collection.delete_one(_id_query(user_id)).deleted_count
+        result = self.collection.update_one(_id_query(user_id), {"$set": {"status": "deleted"}})
+        return result.modified_count

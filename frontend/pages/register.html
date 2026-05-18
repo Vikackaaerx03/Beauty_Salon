@@ -11,17 +11,15 @@
         <a href="../index.html" class="back-link">&larr; На головну</a>
         <p class="home-eyebrow">Реєстрація</p>
         <h1 class="auth-title">Створити акаунт</h1>
-        <p class="auth-note">Реєстрація доступна для клієнтів і майстрів. Адмін створюється окремо.</p>
+        <p class="auth-note">Реєстрація доступна лише для клієнтів. Адмін створюється окремо.</p>
 
         <form id="registerForm" class="auth-form">
             <input type="text" id="name" placeholder="ІМ'Я ТА ПРІЗВИЩЕ" required>
             <input type="email" id="email" placeholder="E-MAIL" required>
             <input type="password" id="password" placeholder="ПАРОЛЬ" required>
 
-            <select id="role">
-                <option value="client">Реєстрація клієнта</option>
-                <option value="master">Реєстрація майстра</option>
-            </select>
+            <input type="hidden" id="role" value="client">
+            <p class="auth-note auth-note--center">Реєстрація доступна лише для клієнтів.</p>
 
             <div id="registerError" class="form-error" aria-live="polite" role="alert" hidden></div>
 

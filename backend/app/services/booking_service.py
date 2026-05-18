@@ -1,24 +1,32 @@
 ﻿from __future__ import annotations
 
 import logging
+import threading
 from datetime import datetime, timezone
 from app.repositories.booking_repository import BookingRepository
+from app.repositories.feedback_repository import FeedbackRepository
+from app.repositories.payments_repository import PaymentRepository
 from app.repositories.schedules_repository import ScheduleRepository
 from app.repositories.user_repository import UserRepository
 from app.repositories.services_repository import ServiceRepository
 from app.schemas.booking_schema import BookingCreate, BookingUpdate
+from app.schemas.payments_schema import PaymentUpdate
 from app.utils.email_utils import send_feedback_request_email
 
 logger = logging.getLogger(__name__)
+_feedback_email_jobs: list[threading.Timer] = []
 
 
 class BookingService:
     def __init__(self, bookings: BookingRepository, schedules: ScheduleRepository,
-                 users: UserRepository = None, services: ServiceRepository = None):
+                 users: UserRepository = None, services: ServiceRepository = None,
+                 payments: PaymentRepository | None = None, feedback: FeedbackRepository | None = None):
         self.bookings = bookings
         self.schedules = schedules
         self.users = users
         self.services = services
+        self.payments = payments
+        self.feedback = feedback
 
     def _enrich_booking(self, booking: dict | None) -> dict | None:
         if booking is None:
@@ -108,8 +116,8 @@ class BookingService:
             raise ValueError("Booking not found")
         return self._enrich_booking(booking)
 
-    def list(self, client_id: str | None = None, master_id: str | None = None) -> list[dict]:
-        return self._enrich_many(self.bookings.get_all(client_id=client_id, master_id=master_id))
+    def list(self, client_id: str | None = None, master_id: str | None = None, include_deleted: bool = False) -> list[dict]:
+        return self._enrich_many(self.bookings.get_all(client_id=client_id, master_id=master_id, include_deleted=include_deleted))
 
     def update(self, booking_id: str, payload: BookingUpdate) -> dict:
         current = self.bookings.get_by_id(booking_id)
@@ -168,13 +176,22 @@ class BookingService:
                     service_name = service.get("name", "послугу")
 
                     if client_email:
-                        send_feedback_request_email(
-                            client_email=client_email,
-                            client_name=client_name,
-                            master_name=master_name,
-                            service_name=service_name,
-                            booking_id=booking_id
-                        )
+                        def _send_feedback_email() -> None:
+                            try:
+                                send_feedback_request_email(
+                                    client_email=client_email,
+                                    client_name=client_name,
+                                    master_name=master_name,
+                                    service_name=service_name,
+                                    booking_id=booking_id,
+                                )
+                            except Exception as email_error:
+                                logger.error("Помилка відкладеної відправки email: %s", email_error)
+
+                        timer = threading.Timer(180, _send_feedback_email)
+                        timer.daemon = True
+                        _feedback_email_jobs.append(timer)
+                        timer.start()
             except Exception as e:
                 logger.error("Помилка відправки email: %s", e)
 
@@ -192,3 +209,18 @@ class BookingService:
         if deleted == 0:
             raise ValueError("Booking not found")
         self.schedules.mark_free(current["timeslot_id"])
+
+        if self.payments is not None:
+            payments = self.payments.get_all(booking_id=str(booking_id), include_deleted=True)
+            for payment in payments:
+                payment_status = str(payment.get("status") or "").lower()
+                if payment_status == "paid":
+                    self.payments.update(str(payment.get("id")), PaymentUpdate(status="refunded"))
+                elif payment_status != "deleted":
+                    self.payments.update(str(payment.get("id")), PaymentUpdate(status="deleted"))
+
+        if self.feedback is not None:
+            feedbacks = self.feedback.get_all(include_deleted=True)
+            for item in feedbacks:
+                if str(item.get("booking_id")) == str(booking_id):
+                    self.feedback.delete(str(item.get("id")))

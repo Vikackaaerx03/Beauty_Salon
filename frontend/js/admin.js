@@ -47,11 +47,14 @@
 
     const statusLabel = (status) => {
         const map = {
+            active: '<span class="badge status-confirmed">Активний</span>',
             pending: '<span class="badge status-pending">Очікує</span>',
             confirmed: '<span class="badge status-confirmed">Підтверджено</span>',
             completed: '<span class="badge status-completed">Виконано</span>',
             expired: '<span class="badge status-expired">Прострочено</span>',
             canceled: '<span class="badge status-canceled">Скасовано</span>',
+            deleted: '<span class="badge status-canceled">Видалено</span>',
+            archived: '<span class="badge status-confirmed">В архіві</span>',
             free: '<span class="badge status-confirmed">Вільно</span>',
             booked: '<span class="badge status-pending">Зайнято</span>',
             paid: '<span class="badge status-confirmed">Оплачено</span>',
@@ -61,10 +64,12 @@
         return map[status] || `<span class="badge">${esc(status || "—")}</span>`;
     };
 
+    const isReadOnlyStatus = (value) => ["deleted", "archived", "canceled", "expired", "refunded"].includes(String(value || "").trim().toLowerCase());
+
     const actionButton = (label, action, entity, id, className) =>
         `<button type="button" class="${className}" data-action="${action}" data-entity="${entity}" data-id="${esc(id)}">${label}</button>`;
 
-    const isPendingPayment = (payment) => !["paid", "refunded"].includes(String(payment?.status || ""));
+    const isPendingPayment = (payment) => !["paid", "refunded", "deleted"].includes(String(payment?.status || ""));
 
     const getNameById = (items, id) => items.find((item) => String(item.id) === String(id))?.name || `#${id}`;
     const formatDate = (value) => {
@@ -141,7 +146,14 @@
 
     const loadAll = async () => {
         const entities = ["bookings", "payments", "users", "services", "schedules", "feedback"];
-        const results = await Promise.allSettled(entities.map((entity) => request(`/${entity}`)));
+        const results = await Promise.allSettled(entities.map((entity) => {
+            if (entity === "services") return request("/services?include_deleted=true");
+            if (entity === "schedules") return request("/schedules?include_deleted=true");
+            if (entity === "payments") return request("/payments?include_deleted=true");
+            if (entity === "feedback") return request("/feedback?include_deleted=true");
+            if (entity === "bookings") return request("/bookings");
+            return request(`/${entity}`);
+        }));
 
         const nextState = {};
         const failedEntities = [];
@@ -190,10 +202,10 @@
         const headers = {
             bookings: ["ID", "Клієнт", "Послуга", "Майстер", "Слот", "Статус", "Дії"],
             payments: ["ID", "Booking", "Сума", "Метод", "Статус", "Дії"],
-            users: ["ID", "Ім'я", "Email", "Роль", "Дії"],
-            services: ["ID", "Назва", "Ціна", "Час", "Дії"],
+            users: ["ID", "Ім'я", "Email", "Роль", "Статус", "Дії"],
+            services: ["ID", "Назва", "Ціна", "Час", "Статус", "Дії"],
             schedules: ["ID", "Майстер", "Початок", "Статус", "Дії"],
-            feedback: ["ID", "Клієнт", "Майстер", "Рейтинг", "Коментар", "Дії"],
+            feedback: ["ID", "Клієнт", "Майстер", "Рейтинг", "Коментар", "Статус", "Дії"],
         };
 
         table.innerHTML = `
@@ -211,14 +223,15 @@
         const headers = {
             bookings: ["ID", "Клієнт", "Послуга", "Майстер", "Слот", "Статус", "Дії"],
             payments: ["ID", "Booking", "Сума", "Метод", "Статус", "Дії"],
-            users: ["ID", "Ім'я", "Email", "Роль", "Дії"],
-            services: ["ID", "Назва", "Ціна", "Час", "Дії"],
+            users: ["ID", "Ім'я", "Email", "Роль", "Статус", "Дії"],
+            services: ["ID", "Назва", "Ціна", "Час", "Статус", "Дії"],
             schedules: ["ID", "Майстер", "Початок", "Статус", "Дії"],
-            feedback: ["ID", "Клієнт", "Майстер", "Рейтинг", "Коментар", "Дії"],
+            feedback: ["ID", "Клієнт", "Майстер", "Рейтинг", "Коментар", "Статус", "Дії"],
         };
 
         const rowHtml = (item) => {
             if (entity === "bookings") {
+                const locked = isReadOnlyStatus(item.status);
                 return `
                     <tr>
                         <td>${esc(item.id)}</td>
@@ -228,14 +241,14 @@
                         <td>${esc(window.getBookingTimeLabel ? window.getBookingTimeLabel(item) : (item.timeslot_start ? formatDate(item.timeslot_start) : (item.timeslot_id || "—")))}</td>
                         <td>${statusLabel(displayBookingStatus(item))}</td>
                         <td class="admin-actions-cell">
-                            ${actionButton("Редагувати", "edit", entity, item.id, "btn-row btn-row-edit")}
-                            ${actionButton("Видалити", "delete", entity, item.id, "btn-row btn-row-delete")}
+                            ${locked ? '<span class="badge status-confirmed">Тільки перегляд</span>' : `${actionButton("Редагувати", "edit", entity, item.id, "btn-row btn-row-edit")}${actionButton("Видалити", "delete", entity, item.id, "btn-row btn-row-delete")}`}
                         </td>
                     </tr>
                 `;
             }
 
             if (entity === "payments") {
+                const locked = isReadOnlyStatus(item.status);
                 return `
                     <tr>
                         <td>${esc(item.id)}</td>
@@ -244,8 +257,7 @@
                         <td>${esc(item.method || "—")}</td>
                         <td>${statusLabel(item.status)}</td>
                         <td class="admin-actions-cell">
-                            ${actionButton("Редагувати", "edit", entity, item.id, "btn-row btn-row-edit")}
-                            ${actionButton("Видалити", "delete", entity, item.id, "btn-row btn-row-delete")}
+                            ${locked ? '<span class="badge status-confirmed">Тільки перегляд</span>' : `${actionButton("Редагувати", "edit", entity, item.id, "btn-row btn-row-edit")}${actionButton("Видалити", "delete", entity, item.id, "btn-row btn-row-delete")}`}
                         </td>
                     </tr>
                 `;
@@ -253,49 +265,53 @@
 
             if (entity === "users") {
                 if (item.role === "admin") {
-                    return `
-                        <tr>
-                            <td>${esc(item.id)}</td>
-                            <td>${esc(item.name)}</td>
-                            <td>${esc(item.email)}</td>
-                            <td>${esc(item.role)}</td>
-                            <td class="admin-actions-cell">
-                                <span class="badge status-confirmed">Захищено</span>
-                            </td>
-                        </tr>
-                    `;
-                }
-
                 return `
                     <tr>
                         <td>${esc(item.id)}</td>
                         <td>${esc(item.name)}</td>
                         <td>${esc(item.email)}</td>
                         <td>${esc(item.role)}</td>
+                        <td>${statusLabel(item.status || "active")}</td>
                         <td class="admin-actions-cell">
-                            ${actionButton("Редагувати", "edit", entity, item.id, "btn-row btn-row-edit")}
-                            ${actionButton("Видалити", "delete", entity, item.id, "btn-row btn-row-delete")}
+                            <span class="badge status-confirmed">Захищено</span>
+                        </td>
+                    </tr>
+                `;
+                }
+
+                const locked = isReadOnlyStatus(item.status);
+                return `
+                    <tr>
+                        <td>${esc(item.id)}</td>
+                        <td>${esc(item.name)}</td>
+                        <td>${esc(item.email)}</td>
+                        <td>${esc(item.role)}</td>
+                        <td>${statusLabel(item.status || "active")}</td>
+                        <td class="admin-actions-cell">
+                            ${locked ? '<span class="badge status-confirmed">Тільки перегляд</span>' : `${actionButton("Редагувати", "edit", entity, item.id, "btn-row btn-row-edit")}${actionButton("Видалити", "delete", entity, item.id, "btn-row btn-row-delete")}`}
                         </td>
                     </tr>
                 `;
             }
 
             if (entity === "services") {
+                const locked = isReadOnlyStatus(item.status);
                 return `
                     <tr>
                         <td>${esc(item.id)}</td>
                         <td>${esc(item.name)}</td>
                         <td>${esc(item.price)} грн</td>
                         <td>${esc(item.duration_minutes)} хв</td>
+                        <td>${statusLabel(item.status || "active")}</td>
                         <td class="admin-actions-cell">
-                            ${actionButton("Редагувати", "edit", entity, item.id, "btn-row btn-row-edit")}
-                            ${actionButton("Видалити", "delete", entity, item.id, "btn-row btn-row-delete")}
+                            ${locked ? '<span class="badge status-confirmed">Тільки перегляд</span>' : `${actionButton("Редагувати", "edit", entity, item.id, "btn-row btn-row-edit")}${actionButton("Видалити", "delete", entity, item.id, "btn-row btn-row-delete")}`}
                         </td>
                     </tr>
                 `;
             }
 
             if (entity === "schedules") {
+                const locked = isReadOnlyStatus(item.status);
                 return `
                     <tr>
                         <td>${esc(item.id)}</td>
@@ -303,13 +319,13 @@
                         <td>${esc(item.start ? formatDate(item.start) : "—")}</td>
                         <td>${statusLabel(displayBookingStatus(item))}</td>
                         <td class="admin-actions-cell">
-                            ${actionButton("Редагувати", "edit", entity, item.id, "btn-row btn-row-edit")}
-                            ${actionButton("Видалити", "delete", entity, item.id, "btn-row btn-row-delete")}
+                            ${locked ? '<span class="badge status-confirmed">Тільки перегляд</span>' : `${actionButton("Редагувати", "edit", entity, item.id, "btn-row btn-row-edit")}${actionButton("Видалити", "delete", entity, item.id, "btn-row btn-row-delete")}`}
                         </td>
                     </tr>
                 `;
             }
 
+            const locked = isReadOnlyStatus(item.status);
             return `
                 <tr>
                     <td>${esc(item.id)}</td>
@@ -317,9 +333,9 @@
                     <td>${esc(getNameById(state.users, item.master_id))}</td>
                     <td>${esc(item.rating)}★</td>
                     <td>${esc(item.comment || "—")}</td>
+                    <td>${statusLabel(item.status || "active")}</td>
                     <td class="admin-actions-cell">
-                        ${actionButton("Редагувати", "edit", entity, item.id, "btn-row btn-row-edit")}
-                        ${actionButton("Видалити", "delete", entity, item.id, "btn-row btn-row-delete")}
+                        ${locked ? '<span class="badge status-confirmed">Тільки перегляд</span>' : `${actionButton("Редагувати", "edit", entity, item.id, "btn-row btn-row-edit")}${actionButton("Видалити", "delete", entity, item.id, "btn-row btn-row-delete")}`}
                     </td>
                 </tr>
             `;
@@ -393,10 +409,10 @@
                 .map((u) => `<option value="${u.id}" ${String(currentValue) === String(u.id) ? "selected" : ""}>${esc(u.name)} (#${u.id})</option>`).join("");
         }
         if (entity === "schedules" && field === "status") {
-            return ["free", "booked"].map((status) => `<option value="${status}" ${String(currentValue) === status ? "selected" : ""}>${status}</option>`).join("");
+            return ["free", "booked", "deleted", "archived"].map((status) => `<option value="${status}" ${String(currentValue) === status ? "selected" : ""}>${status}</option>`).join("");
         }
         if (entity === "payments" && field === "status") {
-            return ["unpaid", "paid", "refunded"].map((status) => `<option value="${status}" ${String(currentValue) === status ? "selected" : ""}>${status}</option>`).join("");
+            return ["unpaid", "paid", "refunded", "deleted"].map((status) => `<option value="${status}" ${String(currentValue) === status ? "selected" : ""}>${status}</option>`).join("");
         }
         if (entity === "payments" && field === "method") {
             return ["card", "cash"].map((method) => `<option value="${method}" ${String(currentValue) === method ? "selected" : ""}>${method}</option>`).join("");

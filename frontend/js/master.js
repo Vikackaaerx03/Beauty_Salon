@@ -146,6 +146,18 @@
         return "status-pending";
     };
 
+    const bookingFilterOptions = [
+        ["all", "Усі"],
+        ["pending", "В очікуванні"],
+        ["completed", "Виконані"],
+        ["confirmed", "Підтверджені"],
+        ["canceled", "Скасовані"],
+        ["expired", "Прострочені"],
+        ["deleted", "Видалені"],
+        ["refunded", "Повернені"],
+        ["archived", "В архіві"],
+    ];
+
     const updateLocalUser = (updatedFields) => {
         user = { ...user, ...updatedFields };
         localStorage.setItem("user", JSON.stringify(user));
@@ -156,6 +168,14 @@
         if (avatarPreview) {
             avatarPreview.src = resolveAvatar(user);
         }
+    };
+
+    const renderBookingFilterOptions = () => {
+        if (!bookingsFilter) return;
+        const currentValue = String(bookingsFilter.value || "all");
+        bookingsFilter.innerHTML = bookingFilterOptions
+            .map(([value, label]) => `<option value="${value}" ${currentValue === value ? "selected" : ""}>${label}</option>`)
+            .join("");
     };
 
     const renderServicesBadge = () => {
@@ -194,7 +214,7 @@
             const payment = booking.payment || null;
             const paymentMethod = String(payment?.method || "").trim().toLowerCase();
             const paymentStatus = String(payment?.status || "").trim().toLowerCase();
-            const canManageBooking = displayStatus !== "expired";
+            const canManageBooking = !["expired", "deleted", "canceled", "refunded", "archived"].includes(displayStatus);
             const canAcceptCashPayment = displayStatus === "completed" && (paymentMethod === "cash" || !payment) && paymentStatus !== "paid";
             const paymentBadgeLabel = payment ? paymentLabel(payment?.status) : "Не оплачено";
             const paymentBadgeClass = payment ? paymentClass(payment?.status) : "status-pending";
@@ -304,7 +324,7 @@
 
     const loadBookings = async () => {
         const [bookingsResult, feedbackResult] = await Promise.allSettled([
-            request(`/bookings/master/${user.id}`),
+            request(`/bookings/master/${user.id}?include_deleted=true`),
             request(`/feedback?master_id=${user.id}`),
         ]);
 
@@ -348,6 +368,8 @@
     if (dashboardTitle) {
         dashboardTitle.textContent = `Кабінет майстра: ${user.name || "Майстер"}`;
     }
+
+    renderBookingFilterOptions();
 
     if (dashboardSubtitle) {
         dashboardSubtitle.textContent = "Тут ти керуєш своїми записами, профілем, аватаркою, послугами та відгуками.";

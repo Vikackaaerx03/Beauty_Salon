@@ -10,6 +10,7 @@ class FeedbackBase(BaseModel):
     rating: int = Field(ge=1, le=5)
     comment: str | None = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
+    status: str = "active"
     
     model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)
 

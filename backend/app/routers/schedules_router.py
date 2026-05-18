@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.security import get_current_admin, logger
-from app.db.database import get_schedules_collection
+from app.db.database import get_bookings_collection, get_feedback_collection, get_payments_collection, get_schedules_collection
+from app.repositories.booking_repository import BookingRepository
+from app.repositories.feedback_repository import FeedbackRepository
+from app.repositories.payments_repository import PaymentRepository
 from app.repositories.schedules_repository import ScheduleRepository
 from app.services.schedules_service import SchedulesService
 from app.schemas.schedules_schema import TimeslotCreate, TimeslotDB, TimeslotUpdate
@@ -8,8 +11,18 @@ from app.schemas.schedules_schema import TimeslotCreate, TimeslotDB, TimeslotUpd
 router = APIRouter(prefix="/schedules", tags=["Schedules"])
 
 
-def get_schedules_service(collection=Depends(get_schedules_collection)) -> SchedulesService:
-    return SchedulesService(ScheduleRepository(collection))
+def get_schedules_service(
+    collection=Depends(get_schedules_collection),
+    bookings_collection=Depends(get_bookings_collection),
+    payments_collection=Depends(get_payments_collection),
+    feedback_collection=Depends(get_feedback_collection),
+) -> SchedulesService:
+    return SchedulesService(
+        ScheduleRepository(collection),
+        BookingRepository(bookings_collection),
+        PaymentRepository(payments_collection),
+        FeedbackRepository(feedback_collection),
+    )
 
 
 @router.post("", response_model=TimeslotDB, status_code=status.HTTP_201_CREATED)
@@ -28,8 +41,9 @@ def list_timeslots(
     master_id: str | None = None,
     status_filter: str | None = None,
     service: SchedulesService = Depends(get_schedules_service),
+    include_deleted: bool = False,
 ):
-    return service.list(master_id=master_id, status=status_filter)
+    return service.list(master_id=master_id, status=status_filter, include_deleted=include_deleted)
 
 
 @router.get("/{timeslot_id}", response_model=TimeslotDB)

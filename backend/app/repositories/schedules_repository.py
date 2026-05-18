@@ -35,11 +35,14 @@ class ScheduleRepository:
     def get_by_id(self, timeslot_id: str) -> dict | None:
         return self._format(self.collection.find_one(_id_query(timeslot_id)))
 
-    def get_all(self, master_id=None, status=None) -> list[dict]:
+    def get_all(self, master_id=None, status=None, include_deleted: bool = False) -> list[dict]:
         query: dict = {}
         if master_id:
             query["master_id"] = {"$in": [str(master_id), to_mongo_id(master_id)]}
-        if status:
+        if status is None:
+            if not include_deleted:
+                query["status"] = {"$ne": "deleted"}
+        else:
             query["status"] = status
         docs = [self._format(doc) for doc in list(self.collection.find(query))]
         return sorted(
@@ -61,4 +64,5 @@ class ScheduleRepository:
         return self.collection.update_one(_id_query(timeslot_id), {"$set": {"status": "free", "booking_id": None}}).modified_count
 
     def delete(self, timeslot_id: str) -> int:
-        return self.collection.delete_one(_id_query(timeslot_id)).deleted_count
+        result = self.collection.update_one(_id_query(timeslot_id), {"$set": {"status": "deleted"}})
+        return result.modified_count

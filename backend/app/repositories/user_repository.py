@@ -33,12 +33,14 @@ class UserRepository:
     def get_by_id(self, user_id: str) -> dict | None:
         return self._format(self.collection.find_one(_id_query(user_id)))
 
-    def get_all(self, role: Optional[str] = None, service_id: Optional[str] = None, sort_by: Optional[str] = None) -> list[dict]:
+    def get_all(self, role: Optional[str] = None, service_id: Optional[str] = None, sort_by: Optional[str] = None, include_deleted: bool = False) -> list[dict]:
         match_filter: dict = {}
         if role:
             match_filter["role"] = role
         if service_id:
             match_filter["services_offered"] = {"$in": [str(service_id), to_mongo_id(service_id)]}
+        if not include_deleted:
+            match_filter["status"] = {"$ne": "deleted"}
 
         pipeline = [
             {"$match": match_filter},
@@ -92,8 +94,8 @@ class UserRepository:
         return result.modified_count
 
     def delete(self, user_id: str) -> int:
-        result = self.collection.delete_one(_id_query(user_id))
-        return result.deleted_count
+        result = self.collection.update_one(_id_query(user_id), {"$set": {"status": "deleted"}})
+        return result.modified_count
 
     def _format(self, doc: dict | None) -> dict | None:
         if not doc:
@@ -108,4 +110,5 @@ class UserRepository:
 
         formatted["rating"] = round(float(formatted.get("rating", 0.0) or 0.0), 1)
         formatted["services_offered"] = [str(service_id) for service_id in (formatted.get("services_offered") or [])]
+        formatted.setdefault("status", "active")
         return formatted

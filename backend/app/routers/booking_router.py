@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.security import get_current_admin, get_current_master_or_admin, get_current_user, logger
-from app.db.database import get_bookings_collection, get_schedules_collection, get_services_collection, get_users_collection
+from app.db.database import get_bookings_collection, get_feedback_collection, get_payments_collection, get_schedules_collection, get_services_collection, get_users_collection
 from app.repositories.booking_repository import BookingRepository
+from app.repositories.feedback_repository import FeedbackRepository
+from app.repositories.payments_repository import PaymentRepository
 from app.repositories.schedules_repository import ScheduleRepository
 from app.repositories.services_repository import ServiceRepository
 from app.repositories.user_repository import UserRepository
@@ -17,12 +19,16 @@ def get_booking_service(
     schedules_collection=Depends(get_schedules_collection),
     users_collection=Depends(get_users_collection),
     services_collection=Depends(get_services_collection),
+    payments_collection=Depends(get_payments_collection),
+    feedback_collection=Depends(get_feedback_collection),
 ) -> BookingService:
     return BookingService(
         BookingRepository(bookings_collection),
         ScheduleRepository(schedules_collection),
         UserRepository(users_collection),
         ServiceRepository(services_collection),
+        PaymentRepository(payments_collection),
+        FeedbackRepository(feedback_collection),
     )
 
 
@@ -61,7 +67,7 @@ def list_bookings(
     service: BookingService = Depends(get_booking_service),
     current_admin: dict = Depends(get_current_admin),
 ):
-    return service.list()
+    return service.list(include_deleted=True)
 
 
 @router.get("/user/{user_id}", response_model=list[BookingDB])
@@ -69,10 +75,11 @@ def list_user_bookings(
     user_id: str,
     service: BookingService = Depends(get_booking_service),
     current_user: dict = Depends(get_current_user),
+    include_deleted: bool = False,
 ):
     if current_user.get("role") != "admin" and current_user.get("id") != str(user_id):
         raise HTTPException(status_code=403, detail="Доступ заборонено")
-    return service.list(client_id=str(user_id))
+    return service.list(client_id=str(user_id), include_deleted=include_deleted)
 
 
 @router.get("/master/{master_id}", response_model=list[BookingDB])
@@ -80,10 +87,11 @@ def list_master_bookings(
     master_id: str,
     service: BookingService = Depends(get_booking_service),
     current_user: dict = Depends(get_current_user),
+    include_deleted: bool = False,
 ):
     if current_user.get("role") != "admin" and current_user.get("id") != str(master_id):
         raise HTTPException(status_code=403, detail="Доступ заборонено")
-    return service.list(master_id=str(master_id))
+    return service.list(master_id=str(master_id), include_deleted=include_deleted)
 
 
 @router.patch("/{booking_id}", response_model=BookingDB)

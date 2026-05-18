@@ -21,3 +21,4 @@ class ServiceUpdate(BaseModel):
 
 class ServiceDB(ServiceBase):
     id: str
+    status: str = "active"

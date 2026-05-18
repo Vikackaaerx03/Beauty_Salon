@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 
 PaymentMethod = Literal["card", "cash"]
-PaymentStatus = Literal["paid", "unpaid", "refunded"]
+PaymentStatus = Literal["paid", "unpaid", "refunded", "deleted"]
 
 class PaymentBase(BaseModel):
     booking_id: str

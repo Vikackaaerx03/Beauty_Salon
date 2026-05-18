@@ -22,6 +22,7 @@ class FeedbackRepository:
         doc = dict(doc)
         doc["id"] = str(doc.get("id") or doc.get("_id"))
         doc.pop("_id", None)
+        doc.setdefault("status", "active")
         for field in ("booking_id", "client_id", "master_id"):
             if doc.get(field) is not None:
                 doc[field] = str(doc[field])
@@ -42,18 +43,21 @@ class FeedbackRepository:
 
         data["id"] = str(self.collection.count_documents({}) + 1)
         data["created_at"] = data.get("created_at") or datetime.utcnow()
+        data.setdefault("status", "active")
         self.collection.insert_one(data)
         return data["id"]
 
     def get_by_id(self, feedback_id: str) -> dict | None:
         return self._format_doc(self.collection.find_one(_id_query(feedback_id)))
 
-    def get_all(self, client_id: str | None = None, master_id: str | None = None) -> list[dict]:
+    def get_all(self, client_id: str | None = None, master_id: str | None = None, include_deleted: bool = False) -> list[dict]:
         query: dict = {}
         if client_id:
             query["client_id"] = {"$in": [str(client_id), to_mongo_id(client_id)]}
         if master_id:
             query["master_id"] = {"$in": [str(master_id), to_mongo_id(master_id)]}
+        if not include_deleted:
+            query["status"] = {"$ne": "deleted"}
         docs = [self._format_doc(doc) for doc in list(self.collection.find(query))]
         return sorted(
             [doc for doc in docs if doc is not None],
@@ -70,4 +74,5 @@ class FeedbackRepository:
         return self.get_by_id(feedback_id)
 
     def delete(self, feedback_id: str) -> int:
-        return self.collection.delete_one(_id_query(feedback_id)).deleted_count
+        result = self.collection.update_one(_id_query(feedback_id), {"$set": {"status": "deleted"}})
+        return result.modified_count

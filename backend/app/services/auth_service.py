@@ -12,10 +12,10 @@ class AuthService:
         self.repo = repo
 
     def register(self, payload: AuthRegister) -> AuthResponse:
-        if payload.role not in {"client", "master"}:
-            raise ValueError("Registration role must be client or master")
+        if payload.role != "client":
+            raise ValueError("Registration role must be client")
 
-        existing = self.repo.find_by_email(payload.email)
+        existing = self.repo.find_by_email(payload.email, include_deleted=True)
         if existing is not None:
             raise ValueError("Email already exists")
 

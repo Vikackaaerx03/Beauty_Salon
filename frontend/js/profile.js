@@ -22,6 +22,7 @@
     const profileAvatarPreview = document.getElementById("profileAvatarPreview");
     const profileAvatarFile = document.getElementById("profileAvatarFile");
     let services = [];
+    let mailboxTimer = null;
 
     if (nameInput) nameInput.value = user.name || "";
     if (emailInput) emailInput.value = user.email || "";
@@ -183,12 +184,24 @@
     const statusLabel = (status) => {
         return window.getBookingStatusLabel ? window.getBookingStatusLabel(status) : "В очікуванні";
     };
+    const canCancelBooking = (booking) => {
+        const status = displayBookingStatus(booking);
+        return status === "pending";
+    };
+
+    const formatCountdown = (milliseconds) => {
+        const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    };
 
     const loadHistory = async () => {
         if (!bookingsList) return;
 
         try {
-            const bookings = await request(`/bookings/user/${user.id}`);
+            const bookings = await request(`/bookings/user/${user.id}?include_deleted=true`);
 
             if (!bookings || bookings.length === 0) {
                 bookingsList.innerHTML = "<p class='no-data'>У вас ще немає записів.</p>";
@@ -198,6 +211,7 @@
             bookingsList.innerHTML = bookings.map((booking) => {
                 const displayStatus = displayBookingStatus(booking);
                 const statusClass = window.getBookingStatusClass ? window.getBookingStatusClass(displayStatus) : "status-pending";
+                const slotLabel = window.getBookingTimeLabel ? window.getBookingTimeLabel(booking) : formatDate(booking.created_at);
 
                 return `
                     <article class="booking-history-item">
@@ -206,12 +220,28 @@
                             <span class="badge ${statusClass}">${statusLabel(displayStatus)}</span>
                         </div>
                         <div class="booking-details">
-                            <span>Час: ${escapeHtml(window.getBookingTimeLabel ? window.getBookingTimeLabel(booking) : formatDate(booking.created_at))}</span>
+                            <span>Час: ${escapeHtml(slotLabel)}</span>
                         </div>
                         <div class="master-info">Майстер: ${escapeHtml(booking.master_name || `Майстер #${booking.master_id || "—"}`)}</div>
+                        ${canCancelBooking(booking) ? `<div class="booking-actions"><button type="button" class="btn-outline booking-cancel-btn" data-booking-id="${escapeHtml(booking.id)}">Скасувати запис</button></div>` : ""}
                     </article>
                 `;
             }).join("");
+
+            bookingsList.querySelectorAll(".booking-cancel-btn").forEach((button) => {
+                button.addEventListener("click", async () => {
+                    const bookingId = button.getAttribute("data-booking-id");
+                    if (!bookingId) return;
+                    if (!confirm("Скасувати цей запис?")) return;
+                    try {
+                        await request(`/bookings/${bookingId}/status`, "PATCH", { status: "canceled" });
+                        await loadHistory();
+                        await loadMailBox();
+                    } catch (error) {
+                        alert(error.message || "Не вдалося скасувати запис.");
+                    }
+                });
+            });
         } catch (error) {
             console.error("History loading error:", error);
             bookingsList.innerHTML = "<p class='error-text'>Історія записів наразі недоступна.</p>";
@@ -221,11 +251,44 @@
     const loadMailBox = async () => {
         if (!mailNotifications) return;
 
+        let mailCountdownInterval = null;
+        const refreshMailCountdown = () => {
+            if (!mailNotifications) return;
+            const now = Date.now();
+            mailNotifications.querySelectorAll("article[data-ready-at]").forEach((item) => {
+                const readyAt = Number(item.dataset.readyAt || 0);
+                const remaining = Math.max(0, readyAt - now);
+                const countdownEl = item.querySelector(".feedback-countdown");
+                if (countdownEl) {
+                    countdownEl.textContent = formatCountdown(remaining);
+                }
+                if (remaining <= 0) {
+                    const noteEl = item.querySelector(".feedback-note");
+                    if (noteEl) {
+                        noteEl.textContent = "Ваш запис готовий для відгуку. Натисніть кнопку нижче, щоб залишити оцінку від 1 до 5 та короткий коментар.";
+                    }
+                }
+            });
+        };
+        const startMailCountdown = () => {
+            if (mailCountdownInterval) {
+                clearInterval(mailCountdownInterval);
+            }
+            refreshMailCountdown();
+            mailCountdownInterval = setInterval(refreshMailCountdown, 1000);
+        };
+
         try {
             const [bookings, feedbacks] = await Promise.all([
-                request(`/bookings/user/${user.id}`),
+                request(`/bookings/user/${user.id}?include_deleted=true`),
                 request(`/feedback?client_id=${user.id}`),
             ]);
+            const [servicesList, mastersList] = await Promise.all([
+                request("/services"),
+                request("/users/masters"),
+            ]);
+            const servicesMap = new Map((servicesList || []).map((service) => [String(service.id), service.name]));
+            const mastersMap = new Map((mastersList || []).map((master) => [String(master.id), master.name]));
 
             const feedbackBookingIds = new Set((feedbacks || []).map((item) => String(item.booking_id)));
             const paymentMap = new Map();
@@ -257,20 +320,26 @@
 
             mailNotifications.innerHTML = eligible.map((booking) => {
                 const completedAt = booking.updated_at ? new Date(booking.updated_at).getTime() : Date.now();
-                const hoursSince = Math.max(0, (Date.now() - completedAt) / 36e5);
-                const ready = hoursSince >= 24;
+                const readyAt = completedAt + (24 * 60 * 60 * 1000);
+                const remaining = readyAt - Date.now();
+                const ready = remaining <= 0;
+                const serviceName = booking.service_name || servicesMap.get(String(booking.service_id)) || "Послуга";
+                const masterName = booking.master_name || mastersMap.get(String(booking.master_id)) || "Майстер";
                 const note = ready
-                    ? "Ваш запис готовий для відгуку. Натисніть кнопку нижче і залиште оцінку від 1 до 5 та коментар."
-                    : `Запрошення на відгук буде надіслано приблизно через ${Math.ceil(24 - hoursSince)} год.`;
+                    ? "Ваш запис готовий для відгуку. Натисніть кнопку нижче, щоб залишити оцінку від 1 до 5 та короткий коментар."
+                    : `До доступу: <span class="feedback-countdown">${formatCountdown(remaining)}</span>`;
 
                 return `
-                    <article class="home-feature">
+                    <article class="home-feature" data-ready-at="${readyAt}">
                         <strong>Лист на відгук</strong>
-                        <span>${note}</span>
+                        <div>Майстер: ${escapeHtml(masterName)}</div>
+                        <div>Послуга: ${escapeHtml(serviceName)}</div>
+                        <div class="feedback-note">${note}</div>
                         ${ready ? `<a class="btn-outline" style="margin-top:12px;" href="feedback.html?booking_id=${encodeURIComponent(booking.id)}">Залишити відгук</a>` : ""}
                     </article>
                 `;
             }).join("");
+            startMailCountdown();
         } catch (error) {
             console.error("Mailbox loading error:", error);
             mailNotifications.innerHTML = "<p class='error-text'>Не вдалося завантажити пошту.</p>";
@@ -289,6 +358,13 @@
 
     await loadHistory();
     await loadMailBox();
+    mailboxTimer = window.setInterval(loadMailBox, 1000);
+
+    window.addEventListener("beforeunload", () => {
+        if (mailboxTimer) {
+            window.clearInterval(mailboxTimer);
+        }
+    });
 });
 
 

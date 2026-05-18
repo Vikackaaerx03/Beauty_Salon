@@ -1,4 +1,4 @@
-﻿document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const serviceSelect = document.getElementById("serviceSelect");
     const masterSelect = document.getElementById("masterSelect");
     const timeslotSelect = document.getElementById("timeslotSelect");
@@ -22,7 +22,7 @@
 
     const stars = (rating) => {
         const value = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
-        return `${"в…".repeat(value)}${"в†".repeat(5 - value)}`;
+        return `${"★".repeat(value)}${"☆".repeat(5 - value)}`;
     };
 
     const seedHash = (value) => {
@@ -108,7 +108,7 @@
 
         const master = masters.find((item) => String(item.id) === String(masterId));
         if (!master) {
-            masterPreview.innerHTML = `<div class="master-preview__empty">РћР±РµСЂС–С‚СЊ РјР°Р№СЃС‚СЂР°, С‰РѕР± РїРѕР±Р°С‡РёС‚Рё СЂРµР№С‚РёРЅРі С– РїРѕСЃР»СѓРіРё.</div>`;
+            masterPreview.innerHTML = `<div class="master-preview__empty">Оберіть майстра, щоб побачити рейтинг і послуги.</div>`;
             return;
         }
 
@@ -125,7 +125,7 @@
                         <span class="master-preview__rating">${stars(rating)} ${rating.toFixed(1)}</span>
                     </div>
                     <div class="master-preview__services">
-                        ${servicesList.length ? servicesList.map((service) => `<span>${escapeHtml(service)}</span>`).join("") : "<span>РџРѕСЃР»СѓРіРё С‰Рµ РЅРµ РІРєР°Р·Р°РЅС–</span>"}
+                        ${servicesList.length ? servicesList.map((service) => `<span>${escapeHtml(service)}</span>`).join("") : "<span>Послуги ще не вказані</span>"}
                     </div>
                 </div>
             </div>
@@ -134,8 +134,8 @@
 
     const renderServiceOptions = () => {
         if (!serviceSelect) return;
-        const options = services.map((service) => `<option value="${escapeHtml(service.id)}">${escapeHtml(service.name)} (${escapeHtml(service.price)} РіСЂРЅ)</option>`).join("");
-        serviceSelect.innerHTML = `<option value="">РћР±РµСЂС–С‚СЊ РїРѕСЃР»СѓРіСѓ</option>${options}`;
+        const options = services.map((service) => `<option value="${escapeHtml(service.id)}">${escapeHtml(service.name)} (${escapeHtml(service.price)} грн)</option>`).join("");
+        serviceSelect.innerHTML = `<option value="">Оберіть послугу</option>${options}`;
     };
 
     const renderMasterOptions = () => {
@@ -146,13 +146,13 @@
         const currentMasterValue = masterSelect.value;
 
         masterSelect.innerHTML = `
-            <option value="">РћР±РµСЂС–С‚СЊ РјР°Р№СЃС‚СЂР°</option>
+            <option value="">Оберіть майстра</option>
             ${list.map((master) => {
                 const rating = Number(ratingByMaster.get(String(master.id)) ?? master.rating ?? 0);
                 const matchedServices = (master.services_offered || []).map((serviceId) => serviceNameById(serviceId)).filter(Boolean).slice(0, 3).join(", ");
                 return `
                     <option value="${escapeHtml(master.id)}" ${String(currentMasterValue) === String(master.id) ? "selected" : ""}>
-                        ${escapeHtml(master.name)} вЂў ${stars(rating)} ${rating.toFixed(1)}${matchedServices ? ` вЂў ${escapeHtml(matchedServices)}` : ""}${selectedServiceId ? ` вЂў ${escapeHtml(serviceNameById(selectedServiceId))}` : ""}
+                        ${escapeHtml(master.name)} • ${stars(rating)} ${rating.toFixed(1)}${matchedServices ? ` • ${escapeHtml(matchedServices)}` : ""}${selectedServiceId ? ` • ${escapeHtml(serviceNameById(selectedServiceId))}` : ""}
                     </option>
                 `;
             }).join("")}
@@ -163,18 +163,18 @@
         }
 
         if (!selectedServiceId) {
-            setHelp("РџС–СЃР»СЏ РІРёР±РѕСЂСѓ РїРѕСЃР»СѓРіРё СЃРїРёСЃРѕРє РјР°Р№СЃС‚СЂС–РІ Р°РІС‚РѕРјР°С‚РёС‡РЅРѕ РІС–РґС„С–Р»СЊС‚СЂСѓС”С‚СЊСЃСЏ.", "info");
+            setHelp("Після вибору послуги список майстрів автоматично відфільтрується.", "info");
             renderMasterPreview("");
             return;
         }
 
         if (list.length === 0) {
-            setHelp("РџС–Рґ С†СЋ РїРѕСЃР»СѓРіСѓ РїРѕРєРё РЅРµРјР°С” РґРѕСЃС‚СѓРїРЅРёС… РјР°Р№СЃС‚СЂС–РІ.", "warning");
+            setHelp("Під цю послугу поки немає доступних майстрів.", "warning");
             renderMasterPreview("");
             return;
         }
 
-        setHelp(`РџС–Рґ РѕР±СЂР°РЅСѓ РїРѕСЃР»СѓРіСѓ Р·РЅР°Р№РґРµРЅРѕ ${list.length} РјР°Р№СЃС‚СЂС–РІ. Р РµР№С‚РёРЅРі РїРѕРєР°Р·Р°РЅРѕ РїСЂСЏРјРѕ РІ СЃРїРёСЃРєСѓ.`, "info");
+        setHelp(`Під обрану послугу знайдено ${list.length} майстрів. Рейтинг показано прямо в списку.`, "info");
         renderMasterPreview(currentMasterValue);
     };
 
@@ -182,13 +182,13 @@
         if (!timeslotSelect) return;
 
         if (!masterId) {
-            timeslotSelect.innerHTML = '<option value="">РЎРїРѕС‡Р°С‚РєСѓ РѕР±РµСЂС–С‚СЊ РјР°Р№СЃС‚СЂР°</option>';
+            timeslotSelect.innerHTML = '<option value="">Спочатку оберіть майстра</option>';
             return;
         }
 
         const slots = getMasterSlots(masterId);
         if (!slots.length) {
-            timeslotSelect.innerHTML = '<option value="">РќРµРјР°С” РґРѕСЃС‚СѓРїРЅРёС… СЃР»РѕС‚С–РІ</option>';
+            timeslotSelect.innerHTML = '<option value="">Немає доступних слотів</option>';
             return;
         }
 
@@ -197,27 +197,27 @@
 
         const availableOptions = available.map((slot) => `
             <option value="${escapeHtml(slot.id)}" class="slot-option slot-option--free">
-                рџџў ${escapeHtml(slotLabel(slot))} вЂў РІС–Р»СЊРЅРѕ
+                🟢 ${escapeHtml(slotLabel(slot))} • вільно
             </option>
         `).join("");
 
         const unavailableOptions = unavailable.map((slot) => {
             const reason = isPastSlot(slot)
-                ? "РјРёРЅСѓРІ"
+                ? "минув"
                 : slot.status === "booked" || slot.booking_id
-                    ? "Р·Р°Р№РЅСЏС‚Рѕ"
-                    : slot.status || "РЅРµРґРѕСЃС‚СѓРїРЅРѕ";
+                    ? "зайнято"
+                    : slot.status || "недоступно";
             return `
                 <option value="${escapeHtml(slot.id)}" disabled class="slot-option slot-option--disabled">
-                    рџ”ґ ${escapeHtml(slotLabel(slot))} вЂў ${escapeHtml(reason)}
+                    🔴 ${escapeHtml(slotLabel(slot))} • ${escapeHtml(reason)}
                 </option>
             `;
         }).join("");
 
         timeslotSelect.innerHTML = `
-            <option value="">РћР±РµСЂС–С‚СЊ Р·СЂСѓС‡РЅРёР№ С‡Р°СЃ</option>
-            ${availableOptions ? `<optgroup label="Р”РѕСЃС‚СѓРїРЅС–">${availableOptions}</optgroup>` : ""}
-            ${unavailableOptions ? `<optgroup label="РќРµРґРѕСЃС‚СѓРїРЅС–">${unavailableOptions}</optgroup>` : ""}
+            <option value="">Оберіть зручний час</option>
+            ${availableOptions ? `<optgroup label="Доступні">${availableOptions}</optgroup>` : ""}
+            ${unavailableOptions ? `<optgroup label="Недоступні">${unavailableOptions}</optgroup>` : ""}
         `;
     };
 
@@ -225,7 +225,7 @@
         services = await request("/services");
         renderServiceOptions();
     } catch (error) {
-        console.error("РџРѕРјРёР»РєР° Р·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ РїРѕСЃР»СѓРі:", error);
+        console.error("Помилка завантаження послуг:", error);
     }
 
     try {
@@ -255,7 +255,7 @@
 
         renderMasterOptions();
     } catch (error) {
-        console.error("РџРѕРјРёР»РєР° Р·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ РјР°Р№СЃС‚СЂС–РІ:", error);
+        console.error("Помилка завантаження майстрів:", error);
     }
 
     try {
@@ -264,7 +264,7 @@
             renderTimeslots(masterSelect.value);
         }
     } catch (error) {
-        console.error("РџРѕРјРёР»РєР° Р·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ СЃР»РѕС‚С–РІ:", error);
+        console.error("Помилка завантаження слотів:", error);
     }
 
     serviceSelect?.addEventListener("change", () => {
@@ -272,7 +272,7 @@
         if (masterSelect) masterSelect.value = "";
         renderMasterPreview("");
         if (timeslotSelect) {
-            timeslotSelect.innerHTML = '<option value="">РЎРїРѕС‡Р°С‚РєСѓ РѕР±РµСЂС–С‚СЊ РјР°Р№СЃС‚СЂР°</option>';
+            timeslotSelect.innerHTML = '<option value="">Спочатку оберіть майстра</option>';
         }
     });
 
@@ -290,13 +290,13 @@
             const timeslotId = timeslotSelect?.value;
 
             if (!serviceId || !masterId || !timeslotId) {
-                alert("Р‘СѓРґСЊ Р»Р°СЃРєР°, РѕР±РµСЂС–С‚СЊ РїРѕСЃР»СѓРіСѓ, РјР°Р№СЃС‚СЂР° С‚Р° С‡Р°СЃ.");
+                alert("Будь ласка, оберіть послугу, майстра та час.");
                 return;
             }
 
             const selectedSlot = schedules.find((slot) => String(slot.id) === String(timeslotId));
             if (!selectedSlot || selectedSlot.status !== "free" || selectedSlot.booking_id || isPastSlot(selectedSlot)) {
-                alert("Р¦РµР№ С‡Р°СЃ РІР¶Рµ РЅРµРґРѕСЃС‚СѓРїРЅРёР№. РћР±РµСЂС–С‚СЊ С–РЅС€РёР№ СЃР»РѕС‚.");
+                alert("Цей час вже недоступний. Оберіть інший слот.");
                 renderTimeslots(masterId);
                 return;
             }
@@ -307,14 +307,12 @@
                     master_id: String(masterId),
                     timeslot_id: String(timeslotId),
                 });
-                alert("Р§СѓРґРѕРІРѕ! Р’Рё СѓСЃРїС–С€РЅРѕ Р·Р°РїРёСЃР°РЅС–.");
+                alert("Чудово! Ви успішно записані.");
                 window.location.href = "profile.html";
             } catch (error) {
                 console.error("Booking error:", error);
-                alert(error.message || "РќРµ РІРґР°Р»РѕСЃСЏ СЃС‚РІРѕСЂРёС‚Рё Р·Р°РїРёСЃ.");
+                alert(error.message || "Не вдалося створити запис.");
             }
         });
     }
 });
-
-

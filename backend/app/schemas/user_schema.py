@@ -21,6 +21,7 @@ class UserBase(BaseModel):
     rating: float = 0.0
     services_offered: list[str] = Field(default_factory=list)
     avatar: str | None = None
+    status: str = "active"
     
     model_config = ConfigDict(populate_by_name=True)
 

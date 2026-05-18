@@ -37,7 +37,7 @@ if (registerForm) {
         const name = nameInput.value.trim();
         const email = emailInput.value.trim();
         const password = passwordInput.value;
-        const role = roleInput.value;
+        const role = "client";
 
         if (!name || !email || !password) {
             showRegisterError("Усі поля є обов'язковими.");
@@ -57,11 +57,6 @@ if (registerForm) {
 
         if (password.length < 12) {
             showRegisterError("Пароль має містити щонайменше 12 символів.");
-            return;
-        }
-
-        if (!["client", "master"].includes(role)) {
-            showRegisterError("Реєстрація доступна тільки для клієнта або майстра.");
             return;
         }
 

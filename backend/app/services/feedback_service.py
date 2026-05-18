@@ -37,10 +37,10 @@ class FeedbackService:
             raise ValueError("Відгук не знайдено")
         return self._enrich_feedback(feedback)
 
-    def list(self, client_id: str | None = None, master_id: str | None = None) -> list[dict]:
+    def list(self, client_id: str | None = None, master_id: str | None = None, include_deleted: bool = False) -> list[dict]:
         return [
             feedback
-            for feedback in (self._enrich_feedback(item) for item in self.repo.get_all(client_id=client_id, master_id=master_id))
+            for feedback in (self._enrich_feedback(item) for item in self.repo.get_all(client_id=client_id, master_id=master_id, include_deleted=include_deleted))
             if feedback is not None
         ]
 

@@ -69,7 +69,7 @@ def list_payments(
     service: PaymentsService = Depends(get_payments_service),
     current_admin: dict = Depends(get_current_admin),
 ):
-    return service.list(booking_id=booking_id)
+    return service.list(booking_id=booking_id, include_deleted=True)
 
 
 @router.get("/{payment_id}", response_model=PaymentDB)

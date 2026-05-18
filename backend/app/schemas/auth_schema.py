@@ -4,7 +4,7 @@ from pydantic import BaseModel, field_validator
 
 from app.schemas.user_schema import UserDB, _ensure_valid_email
 
-RegisterRole = Literal["client", "master"]
+RegisterRole = Literal["client"]
 
 
 class AuthLogin(BaseModel):

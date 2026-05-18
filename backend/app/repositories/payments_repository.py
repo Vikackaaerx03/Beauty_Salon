@@ -33,8 +33,10 @@ class PaymentRepository:
     def get_by_id(self, payment_id: str) -> dict | None:
         return self._format(self.collection.find_one(_id_query(payment_id)))
 
-    def get_all(self, booking_id=None) -> list[dict]:
+    def get_all(self, booking_id=None, include_deleted: bool = False) -> list[dict]:
         query = {"booking_id": {"$in": [str(booking_id), to_mongo_id(booking_id)]}} if booking_id else {}
+        if not include_deleted:
+            query["status"] = {"$ne": "deleted"}
         docs = [self._format(doc) for doc in list(self.collection.find(query))]
         return sorted(
             [doc for doc in docs if doc is not None],
@@ -45,4 +47,5 @@ class PaymentRepository:
         return self.collection.update_one(_id_query(payment_id), {"$set": payment.model_dump(exclude_unset=True)}).modified_count
 
     def delete(self, payment_id: str) -> int:
-        return self.collection.delete_one(_id_query(payment_id)).deleted_count
+        result = self.collection.update_one(_id_query(payment_id), {"$set": {"status": "deleted"}})
+        return result.modified_count
